@@ -648,32 +648,67 @@
 // run('fdg')
 
 
-//============== 05_039_Getter and Setter ========================
-class User {
-	_login: string;
-	password: string;
-	createdAt: Date;
+// //============== 05_039_Getter and Setter ========================
+// class User {
+// 	_login: string;
+// 	password: string;
+// 	createdAt: Date;
 
-	// getLogin(l: string) {
-	// 	this.login = 'user-' + l;
-	// }
+// 	// getLogin(l: string) {
+// 	// 	this.login = 'user-' + l;
+// 	// }
 
-	//Only sync
-	set login(l: string | number) {//Если не указан тип, то берётся тип который возвращает get
-		this._login = 'user-' + l;
-		this.createdAt = new Date();
-	}
+// 	//Only sync
+// 	set login(l: string | number) {//Если не указан тип, то берётся тип который возвращает get
+// 		this._login = 'user-' + l;
+// 		this.createdAt = new Date();
+// 	}
 
-	//Only sync
-	get login() {
-		return this._login;
-	}
+// 	//Only sync
+// 	get login() {
+// 		return this._login;
+// 	}
 
-	async getPassword(p: string) {}
+// 	async getPassword(p: string) {}
+// }
+
+// const user = new User()
+// user.login = 'myLogin';
+// console.log(user);
+// console.log(user.login);
+
+
+//============== 05_040_Implements ========================
+interface ILogger {
+	log(...args): void;
+	error(...args): void;
 }
 
-const user = new User()
-user.login = 'myLogin';
-console.log(user);
-console.log(user.login);
+class Logger implements ILogger {
+	log(...args: any[]): void {
+		console.log(...args);		
+	}
+	async error(...args: any[]): Promise<void> {
+		//Кинуть во внешнюю систему
+		console.log(...args);		
+	}
+}
 
+interface IPayable {
+	pay(paymentId: number): void;
+	price?: number;
+}
+
+interface IDeleteble {
+	delete(): void;
+}
+
+class User implements IPayable, IDeleteble {
+	delete(): void {
+		throw new Error('Method not implemented.');
+	}
+	pay(paymentId: number): void {
+		// throw new Error('Method not implemented.');
+	}
+	// price?: number | undefined;
+}
