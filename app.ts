@@ -678,37 +678,108 @@
 // console.log(user.login);
 
 
-//============== 05_040_Implements ========================
-interface ILogger {
-	log(...args): void;
-	error(...args): void;
+// //============== 05_040_Implements ========================
+// interface ILogger {
+// 	log(...args): void;
+// 	error(...args): void;
+// }
+
+// class Logger implements ILogger {
+// 	log(...args: any[]): void {
+// 		console.log(...args);		
+// 	}
+// 	async error(...args: any[]): Promise<void> {
+// 		//Кинуть во внешнюю систему
+// 		console.log(...args);		
+// 	}
+// }
+
+// interface IPayable {
+// 	pay(paymentId: number): void;
+// 	price?: number;
+// }
+
+// interface IDeleteble {
+// 	delete(): void;
+// }
+
+// class User implements IPayable, IDeleteble {
+// 	delete(): void {
+// 		throw new Error('Method not implemented.');
+// 	}
+// 	pay(paymentId: number): void {
+// 		// throw new Error('Method not implemented.');
+// 	}
+// 	// price?: number | undefined;
+// }
+
+
+//============== 05_041_042_Extends ========================
+type PaymentStatus_1 = 'new' | 'paid';
+
+class Payment {
+	id: number;
+	status: PaymentStatus_1 = 'new';
+
+	constructor(id: number) {
+		this.id = id;
+	}
+
+	pay() {
+		this.status = 'paid';
+	}
 }
 
-class Logger implements ILogger {
-	log(...args: any[]): void {
-		console.log(...args);		
+class PersistentPayment extends Payment {
+	databaseId: number;
+	paidAt: Date;
+
+	constructor() {
+		const id = Math.random();
+		super(id);
 	}
-	async error(...args: any[]): Promise<void> {
-		//Кинуть во внешнюю систему
-		console.log(...args);		
+
+	save() {
+		//Saved to base...
+	}
+
+	override pay(date?: Date) {
+		super.pay();
+		if (date) {
+			this.paidAt = date;
+		}
 	}
 }
 
-interface IPayable {
-	pay(paymentId: number): void;
-	price?: number;
+new PersistentPayment();
+
+class User {
+	name: string = 'user';
+
+	constructor() {
+		console.log(this.name);		
+	}
 }
 
-interface IDeleteble {
-	delete(): void;
+class Admun extends User {
+	name: string = 'admin';
+
+	constructor() {
+		super();
+		console.log(this.name);
+		
+	}
 }
 
-class User implements IPayable, IDeleteble {
-	delete(): void {
-		throw new Error('Method not implemented.');
+new Admun();
+
+//new Error();
+
+class httpError extends Error {
+	code: number;
+
+	constructor(message: string, code?: number) {
+		super(message);
+		this.code = code ?? 500;
 	}
-	pay(paymentId: number): void {
-		// throw new Error('Method not implemented.');
-	}
-	// price?: number | undefined;
 }
