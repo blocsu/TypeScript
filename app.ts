@@ -714,72 +714,127 @@
 // }
 
 
-//============== 05_041_042_Extends ========================
-type PaymentStatus_1 = 'new' | 'paid';
+// //============== 05_041_042_Extends ========================
+// type PaymentStatus_1 = 'new' | 'paid';
+
+// class Payment {
+// 	id: number;
+// 	status: PaymentStatus_1 = 'new';
+
+// 	constructor(id: number) {
+// 		this.id = id;
+// 	}
+
+// 	pay() {
+// 		this.status = 'paid';
+// 	}
+// }
+
+// class PersistentPayment extends Payment {
+// 	databaseId: number;
+// 	paidAt: Date;
+
+// 	constructor() {
+// 		const id = Math.random();
+// 		super(id);
+// 	}
+
+// 	save() {
+// 		//Saved to base...
+// 	}
+
+// 	override pay(date?: Date) {
+// 		super.pay();
+// 		if (date) {
+// 			this.paidAt = date;
+// 		}
+// 	}
+// }
+
+// new PersistentPayment();
+
+// class User {
+// 	name: string = 'user';
+
+// 	constructor() {
+// 		console.log(this.name);		
+// 	}
+// }
+
+// class Admun extends User {
+// 	name: string = 'admin';
+
+// 	constructor() {
+// 		super();
+// 		console.log(this.name);
+		
+// 	}
+// }
+
+// new Admun();
+
+// //new Error();
+
+// class httpError extends Error {
+// 	code: number;
+
+// 	constructor(message: string, code?: number) {
+// 		super(message);
+// 		this.code = code ?? 500;
+// 	}
+// }
+
+
+//============== 05_043_Compositions_against_Extends ========================
+class User {
+	name: string;
+
+	constructor(name: string) {
+		this.name = name;
+	}
+}
+
+//Неправильный вариант т.к. унаследуем много ненужных свойств
+class Users extends Array<User> {
+	searchByName(name: string) {
+		return this.filter(u => u.name === name);
+	}
+
+	override toString(): string {
+		return this.map(u => u.name).join(', ')
+	}
+}
+
+const users = new Users();
+users.push(new User('Vasia'));
+users.push(new User('Piter'));
+console.log(users.toString());
+
+//Правильный вариант, не связываемся жестко с отнаследованным классом без надобности
+class UserList {
+	users: User[];
+
+	push(u: User) {
+		this.users.push(u);
+	}
+}
 
 class Payment {
-	id: number;
-	status: PaymentStatus_1 = 'new';
-
-	constructor(id: number) {
-		this.id = id;
-	}
-
-	pay() {
-		this.status = 'paid';
-	}
+	date: Date;
 }
 
-class PersistentPayment extends Payment {
-	databaseId: number;
-	paidAt: Date;
-
-	constructor() {
-		const id = Math.random();
-		super(id);
-	}
-
-	save() {
-		//Saved to base...
-	}
-
-	override pay(date?: Date) {
-		super.pay();
-		if (date) {
-			this.paidAt = date;
-		}
-	}
+//Неправильный вариант, связваемся жестко с классом  из другой доменной области
+class UserWithPayment extends Payment {
+	name: string;
 }
 
-new PersistentPayment();
+//Правильный вариант, не связываемся жестко с отнаследованным классом без надобности
+class UserWithPayment_2 {
+	user: User;
+	payment: Payment;
 
-class User {
-	name: string = 'user';
-
-	constructor() {
-		console.log(this.name);		
-	}
-}
-
-class Admun extends User {
-	name: string = 'admin';
-
-	constructor() {
-		super();
-		console.log(this.name);
-		
-	}
-}
-
-new Admun();
-
-//new Error();
-
-class httpError extends Error {
-	code: number;
-
-	constructor(message: string, code?: number) {
-		super(message);
-		this.code = code ?? 500;
+	constructor(user: User, payment: Payment) {
+		this.user = user;
+		this.payment = payment;
 	}
 }
