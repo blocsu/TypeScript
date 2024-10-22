@@ -3,18 +3,6 @@
 // function getFullName(firstname: string, secondname: string): string {
 // 	return `${firstname} ${secondname}`
 // }
-var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
-    if (kind === "m") throw new TypeError("Private method is not writable");
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
-    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
-};
-var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
-    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
-};
-var _Vehicle_price;
 // console.log(getFullName('true', 'false'))
 //=================03_014 Массивы ==========================
 // const skills: string[] = ['Dev', 'DevOps', 'Testing'];
@@ -667,31 +655,82 @@ var _Vehicle_price;
 // 		this.payment = payment;
 // 	}
 // }
-//============== 05_044 Visibility of properties ========================
-class Vehicle {
+// //============== 05_044 Visibility of properties ========================
+// class Vehicle {
+// 	public make: string;
+// 	private damages: string[];
+// 	private _model: string;
+// 	protected run: number;
+// 	#price: number;
+// 	set model(m: string) {
+// 		this._model = m;
+// 		this.#price = 100;
+// 	}
+// 	get model() {
+// 		return this._model;
+// 	}
+// 	addDamage(damage: string) {
+// 		this.damages.push(damage);
+// 	}
+// 	isPriceEqual(v: Vehicle) {
+// 		return this.#price === v.#price;
+// 	}
+// }
+// class EuroTruck extends Vehicle {
+// 	setRun(km: number) {
+// 		this.run = km / 0.62;
+// 		// this.damages - error
+// 	}
+// }
+// new Vehicle()
+// new EuroTruck()
+// //============== 05_046 Static properties ========================
+// class UserService {
+// 	// static name: string;
+// 	private static db: any;
+// 	static async getUser(id: number) {
+// 		return this.db.findById(id)
+// 	}
+// 	constructor(id: number) {}
+// 	create() {
+// 		UserService.db;
+// 	}
+// 	static {
+// 		// await new Promise() не можем использавать внутри статик блоков
+// 		UserService.db = 'fgdx';
+// 	}
+// }
+// UserService.getUser(1);
+// const inst = new UserService(1);
+// inst.create();
+//============== 05_047 Working with this ========================
+class Payment {
     constructor() {
-        _Vehicle_price.set(this, void 0);
+        this.date = new Date();
+        this.getDateArrow = () => {
+            return this.date;
+        };
     }
-    set model(m) {
-        this._model = m;
-        __classPrivateFieldSet(this, _Vehicle_price, 100, "f");
-    }
-    get model() {
-        return this._model;
-    }
-    addDamage(damage) {
-        this.damages.push(damage);
-    }
-    isPriceEqual(v) {
-        return __classPrivateFieldGet(this, _Vehicle_price, "f") === __classPrivateFieldGet(v, _Vehicle_price, "f");
+    getDate() {
+        return this.date;
     }
 }
-_Vehicle_price = new WeakMap();
-class EuroTruck extends Vehicle {
-    setRun(km) {
-        this.run = km / 0.62;
-        // this.damages - error
+const p = new Payment();
+const user = {
+    id: 1,
+    paymentDate: p.getDate.bind(p),
+    paymentDateArrow: p.getDateArrow
+};
+// console.log(p.getDate());
+// console.log(user.paymentDate());
+// console.log(user.paymentDateArrow());
+class PaymentPersistent extends Payment {
+    save() {
+        return super.getDate();
+    }
+    instansArrow() {
+        return this.getDateArrow();
     }
 }
-new Vehicle();
-new EuroTruck();
+console.log(new PaymentPersistent().save());
+console.log(new PaymentPersistent().instansArrow());

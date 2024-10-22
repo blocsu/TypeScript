@@ -840,66 +840,106 @@
 // }
 
 
-//============== 05_044 Visibility of properties ========================
-class Vehicle {
-	public make: string;
-	private damages: string[];
-	private _model: string;
-	protected run: number;
-	#price: number;
+// //============== 05_044 Visibility of properties ========================
+// class Vehicle {
+// 	public make: string;
+// 	private damages: string[];
+// 	private _model: string;
+// 	protected run: number;
+// 	#price: number;
 
-	set model(m: string) {
-		this._model = m;
-		this.#price = 100;
-	}
+// 	set model(m: string) {
+// 		this._model = m;
+// 		this.#price = 100;
+// 	}
 
-	get model() {
-		return this._model;
-	}
+// 	get model() {
+// 		return this._model;
+// 	}
 
-	addDamage(damage: string) {
-		this.damages.push(damage);
-	}
+// 	addDamage(damage: string) {
+// 		this.damages.push(damage);
+// 	}
 
-	isPriceEqual(v: Vehicle) {
-		return this.#price === v.#price;
-	}
-}
+// 	isPriceEqual(v: Vehicle) {
+// 		return this.#price === v.#price;
+// 	}
+// }
 
-class EuroTruck extends Vehicle {
-	setRun(km: number) {
-		this.run = km / 0.62;
-		// this.damages - error
-	}
-}
+// class EuroTruck extends Vehicle {
+// 	setRun(km: number) {
+// 		this.run = km / 0.62;
+// 		// this.damages - error
+// 	}
+// }
 
-new Vehicle()
-new EuroTruck()
+// new Vehicle()
+// new EuroTruck()
 
 
-//============== 05_046 Static properties ========================
-class UserService {
-	// static name: string;
-	private static db: any;
+// //============== 05_046 Static properties ========================
+// class UserService {
+// 	// static name: string;
+// 	private static db: any;
 
-	static async getUser(id: number) {
-		return this.db.findById(id)
-	}
+// 	static async getUser(id: number) {
+// 		return this.db.findById(id)
+// 	}
 	
-	constructor(id: number) {}
+// 	constructor(id: number) {}
 
-	create() {
-		UserService.db;
+// 	create() {
+// 		UserService.db;
+// 	}
+
+// 	static {
+// 		// await new Promise() не можем использавать внутри статик блоков
+// 		UserService.db = 'fgdx';
+// 	}
+
+
+// }
+
+// UserService.getUser(1);
+// const inst = new UserService(1);
+// inst.create();
+
+
+//============== 05_047 Working with this ========================
+class Payment {
+	private date: Date = new Date();
+
+	getDate(this: Payment) {
+		return this.date;
 	}
 
-	static {
-		// await new Promise() не можем использавать внутри статик блоков
-		UserService.db = 'fgdx';
+	getDateArrow = () => {
+		return this.date;
 	}
+}
 
+const p = new Payment();
+
+const user = {
+	id: 1,
+	paymentDate: p.getDate.bind(p),
+	paymentDateArrow: p.getDateArrow
 
 }
 
-UserService.getUser(1);
-const inst = new UserService(1);
-inst.create();
+// console.log(p.getDate());
+// console.log(user.paymentDate());
+// console.log(user.paymentDateArrow());
+
+class PaymentPersistent extends Payment {
+	save() {
+		return super.getDate();
+	}
+
+	instansArrow() {
+		return this.getDateArrow();//Это экземпляр от наследованного класса
+	}
+}
+
+console.log(new PaymentPersistent().save());
+console.log(new PaymentPersistent().instansArrow());
