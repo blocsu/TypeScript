@@ -3,6 +3,18 @@
 // function getFullName(firstname: string, secondname: string): string {
 // 	return `${firstname} ${secondname}`
 // }
+var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
+    if (kind === "m") throw new TypeError("Private method is not writable");
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
+    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
+};
+var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+};
+var _Vehicle_price;
 // console.log(getFullName('true', 'false'))
 //=================03_014 Массивы ==========================
 // const skills: string[] = ['Dev', 'DevOps', 'Testing'];
@@ -612,21 +624,74 @@
 // 		this.code = code ?? 500;
 // 	}
 // }
-//============== 05_043_Compositions_against_Extends ========================
-class User {
-    constructor(name) {
-        this.name = name;
+// //============== 05_043_Compositions_against_Extends ========================
+// class User {
+// 	name: string;
+// 	constructor(name: string) {
+// 		this.name = name;
+// 	}
+// }
+// //Неправильный вариант т.к. унаследуем много ненужных свойств
+// class Users extends Array<User> {
+// 	searchByName(name: string) {
+// 		return this.filter(u => u.name === name);
+// 	}
+// 	override toString(): string {
+// 		return this.map(u => u.name).join(', ')
+// 	}
+// }
+// const users = new Users();
+// users.push(new User('Vasia'));
+// users.push(new User('Piter'));
+// console.log(users.toString());
+// //Правильный вариант, не связываемся жестко с отнаследованным классом без надобности
+// class UserList {
+// 	users: User[];
+// 	push(u: User) {
+// 		this.users.push(u);
+// 	}
+// }
+// class Payment {
+// 	date: Date;
+// }
+// //Неправильный вариант, связваемся жестко с классом  из другой доменной области
+// class UserWithPayment extends Payment {
+// 	name: string;
+// }
+// //Правильный вариант, не связываемся жестко с отнаследованным классом без надобности
+// class UserWithPayment_2 {
+// 	user: User;
+// 	payment: Payment;
+// 	constructor(user: User, payment: Payment) {
+// 		this.user = user;
+// 		this.payment = payment;
+// 	}
+// }
+//============== 05_044 Visibility of properties ========================
+class Vehicle {
+    constructor() {
+        _Vehicle_price.set(this, void 0);
+    }
+    set model(m) {
+        this._model = m;
+        __classPrivateFieldSet(this, _Vehicle_price, 100, "f");
+    }
+    get model() {
+        return this._model;
+    }
+    addDamage(damage) {
+        this.damages.push(damage);
+    }
+    isPriceEqual(v) {
+        return __classPrivateFieldGet(this, _Vehicle_price, "f") === __classPrivateFieldGet(v, _Vehicle_price, "f");
     }
 }
-class Users extends Array {
-    searchByName(name) {
-        return this.filter(u => u.name === name);
-    }
-    toString() {
-        return this.map(u => u.name).join(', ');
+_Vehicle_price = new WeakMap();
+class EuroTruck extends Vehicle {
+    setRun(km) {
+        this.run = km / 0.62;
+        // this.damages - error
     }
 }
-const users = new Users();
-users.push(new User('Vasia'));
-users.push(new User('Piter'));
-console.log(users.toString());
+new Vehicle();
+new EuroTruck();

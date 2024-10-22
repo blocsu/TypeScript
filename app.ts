@@ -785,56 +785,121 @@
 // }
 
 
-//============== 05_043_Compositions_against_Extends ========================
-class User {
-	name: string;
+// //============== 05_043_Compositions_against_Extends ========================
+// class User {
+// 	name: string;
 
-	constructor(name: string) {
-		this.name = name;
+// 	constructor(name: string) {
+// 		this.name = name;
+// 	}
+// }
+
+// //Неправильный вариант т.к. унаследуем много ненужных свойств
+// class Users extends Array<User> {
+// 	searchByName(name: string) {
+// 		return this.filter(u => u.name === name);
+// 	}
+
+// 	override toString(): string {
+// 		return this.map(u => u.name).join(', ')
+// 	}
+// }
+
+// const users = new Users();
+// users.push(new User('Vasia'));
+// users.push(new User('Piter'));
+// console.log(users.toString());
+
+// //Правильный вариант, не связываемся жестко с отнаследованным классом без надобности
+// class UserList {
+// 	users: User[];
+
+// 	push(u: User) {
+// 		this.users.push(u);
+// 	}
+// }
+
+// class Payment {
+// 	date: Date;
+// }
+
+// //Неправильный вариант, связваемся жестко с классом  из другой доменной области
+// class UserWithPayment extends Payment {
+// 	name: string;
+// }
+
+// //Правильный вариант, не связываемся жестко с отнаследованным классом без надобности
+// class UserWithPayment_2 {
+// 	user: User;
+// 	payment: Payment;
+
+// 	constructor(user: User, payment: Payment) {
+// 		this.user = user;
+// 		this.payment = payment;
+// 	}
+// }
+
+
+//============== 05_044 Visibility of properties ========================
+class Vehicle {
+	public make: string;
+	private damages: string[];
+	private _model: string;
+	protected run: number;
+	#price: number;
+
+	set model(m: string) {
+		this._model = m;
+		this.#price = 100;
+	}
+
+	get model() {
+		return this._model;
+	}
+
+	addDamage(damage: string) {
+		this.damages.push(damage);
+	}
+
+	isPriceEqual(v: Vehicle) {
+		return this.#price === v.#price;
 	}
 }
 
-//Неправильный вариант т.к. унаследуем много ненужных свойств
-class Users extends Array<User> {
-	searchByName(name: string) {
-		return this.filter(u => u.name === name);
-	}
-
-	override toString(): string {
-		return this.map(u => u.name).join(', ')
+class EuroTruck extends Vehicle {
+	setRun(km: number) {
+		this.run = km / 0.62;
+		// this.damages - error
 	}
 }
 
-const users = new Users();
-users.push(new User('Vasia'));
-users.push(new User('Piter'));
-console.log(users.toString());
+new Vehicle()
+new EuroTruck()
 
-//Правильный вариант, не связываемся жестко с отнаследованным классом без надобности
-class UserList {
-	users: User[];
 
-	push(u: User) {
-		this.users.push(u);
+//============== 05_046 Static properties ========================
+class UserService {
+	// static name: string;
+	private static db: any;
+
+	static async getUser(id: number) {
+		return this.db.findById(id)
 	}
-}
+	
+	constructor(id: number) {}
 
-class Payment {
-	date: Date;
-}
-
-//Неправильный вариант, связваемся жестко с классом  из другой доменной области
-class UserWithPayment extends Payment {
-	name: string;
-}
-
-//Правильный вариант, не связываемся жестко с отнаследованным классом без надобности
-class UserWithPayment_2 {
-	user: User;
-	payment: Payment;
-
-	constructor(user: User, payment: Payment) {
-		this.user = user;
-		this.payment = payment;
+	create() {
+		UserService.db;
 	}
+
+	static {
+		// await new Promise() не можем использавать внутри статик блоков
+		UserService.db = 'fgdx';
+	}
+
+
 }
+
+UserService.getUser(1);
+const inst = new UserService(1);
+inst.create();
