@@ -905,41 +905,71 @@
 // inst.create();
 
 
-//============== 05_047 Working with this ========================
-class Payment {
-	private date: Date = new Date();
+// //============== 05_047 Working with this ========================
+// class Payment {
+// 	private date: Date = new Date();
 
-	getDate(this: Payment) {
-		return this.date;
+// 	getDate(this: Payment) {
+// 		return this.date;
+// 	}
+
+// 	getDateArrow = () => {
+// 		return this.date;
+// 	}
+// }
+
+// const p = new Payment();
+
+// const user = {
+// 	id: 1,
+// 	paymentDate: p.getDate.bind(p),
+// 	paymentDateArrow: p.getDateArrow
+
+// }
+
+// // console.log(p.getDate());
+// // console.log(user.paymentDate());
+// // console.log(user.paymentDateArrow());
+
+// class PaymentPersistent extends Payment {
+// 	save() {
+// 		return super.getDate();
+// 	}
+
+// 	instansArrow() {
+// 		return this.getDateArrow();//Это экземпляр от наследованного класса
+// 	}
+// }
+
+// console.log(new PaymentPersistent().save());
+// console.log(new PaymentPersistent().instansArrow());
+
+
+//============== 05_048 Typification of this ========================
+class UserBilder {
+	name: string;
+
+	setName(name: string): this {
+		this.name = name;
+		return this;
 	}
 
-	getDateArrow = () => {
-		return this.date;
+	isAdmin(): this is AdminBilder {
+		return this instanceof AdminBilder;
 	}
 }
 
-const p = new Payment();
-
-const user = {
-	id: 1,
-	paymentDate: p.getDate.bind(p),
-	paymentDateArrow: p.getDateArrow
-
+class AdminBilder extends UserBilder {
+	roles: string[];
 }
 
-// console.log(p.getDate());
-// console.log(user.paymentDate());
-// console.log(user.paymentDateArrow());
+const res = new UserBilder().setName('Vasia');
+const res2 = new AdminBilder().setName('Piter');
 
-class PaymentPersistent extends Payment {
-	save() {
-		return super.getDate();
-	}
+let user: UserBilder | AdminBilder = new UserBilder();
 
-	instansArrow() {
-		return this.getDateArrow();//Это экземпляр от наследованного класса
-	}
+if (user.isAdmin()) {
+	console.log(user);	
+} else {
+	console.log(user);	
 }
-
-console.log(new PaymentPersistent().save());
-console.log(new PaymentPersistent().instansArrow());
