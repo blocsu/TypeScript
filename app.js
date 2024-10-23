@@ -703,34 +703,71 @@
 // UserService.getUser(1);
 // const inst = new UserService(1);
 // inst.create();
-//============== 05_047 Working with this ========================
-class Payment {
-    constructor() {
-        this.date = new Date();
-        this.getDateArrow = () => {
-            return this.date;
-        };
-    }
-    getDate() {
-        return this.date;
+// //============== 05_047 Working with this ========================
+// class Payment {
+// 	private date: Date = new Date();
+// 	getDate(this: Payment) {
+// 		return this.date;
+// 	}
+// 	getDateArrow = () => {
+// 		return this.date;
+// 	}
+// }
+// const p = new Payment();
+// const user = {
+// 	id: 1,
+// 	paymentDate: p.getDate.bind(p),
+// 	paymentDateArrow: p.getDateArrow
+// }
+// // console.log(p.getDate());
+// // console.log(user.paymentDate());
+// // console.log(user.paymentDateArrow());
+// class PaymentPersistent extends Payment {
+// 	save() {
+// 		return super.getDate();
+// 	}
+// 	instansArrow() {
+// 		return this.getDateArrow();//Это экземпляр от наследованного класса
+// 	}
+// }
+// console.log(new PaymentPersistent().save());
+// console.log(new PaymentPersistent().instansArrow());
+// //============== 05_048 Typification of this ========================
+// class UserBilder {
+// 	name: string;
+// 	setName(name: string): this {
+// 		this.name = name;
+// 		return this;
+// 	}
+// 	isAdmin(): this is AdminBilder {
+// 		return this instanceof AdminBilder;
+// 	}
+// }
+// class AdminBilder extends UserBilder {
+// 	roles: string[];
+// }
+// const res = new UserBilder().setName('Vasia');
+// const res2 = new AdminBilder().setName('Piter');
+// let user: UserBilder | AdminBilder = new UserBilder();
+// if (user.isAdmin()) {
+// 	console.log(user);	
+// } else {
+// 	console.log(user);	
+// }
+//============== 05_049 Abstract classes ========================
+class Controller {
+    handleWithLogs(req) {
+        console.log('Start');
+        this.handle(req);
+        console.log('End');
     }
 }
-const p = new Payment();
-const user = {
-    id: 1,
-    paymentDate: p.getDate.bind(p),
-    paymentDateArrow: p.getDateArrow
-};
-// console.log(p.getDate());
-// console.log(user.paymentDate());
-// console.log(user.paymentDateArrow());
-class PaymentPersistent extends Payment {
-    save() {
-        return super.getDate();
-    }
-    instansArrow() {
-        return this.getDateArrow();
+class UserController extends Controller {
+    handle(req) {
+        console.log(req);
     }
 }
-console.log(new PaymentPersistent().save());
-console.log(new PaymentPersistent().instansArrow());
+// new Controller() - error
+const c = new UserController();
+c.handleWithLogs('Request');
+c.handle('test');

@@ -945,31 +945,55 @@
 // console.log(new PaymentPersistent().instansArrow());
 
 
-//============== 05_048 Typification of this ========================
-class UserBilder {
-	name: string;
+// //============== 05_048 Typification of this ========================
+// class UserBilder {
+// 	name: string;
 
-	setName(name: string): this {
-		this.name = name;
-		return this;
+// 	setName(name: string): this {
+// 		this.name = name;
+// 		return this;
+// 	}
+
+// 	isAdmin(): this is AdminBilder {
+// 		return this instanceof AdminBilder;
+// 	}
+// }
+
+// class AdminBilder extends UserBilder {
+// 	roles: string[];
+// }
+
+// const res = new UserBilder().setName('Vasia');
+// const res2 = new AdminBilder().setName('Piter');
+
+// let user: UserBilder | AdminBilder = new UserBilder();
+
+// if (user.isAdmin()) {
+// 	console.log(user);	
+// } else {
+// 	console.log(user);	
+// }
+
+
+//============== 05_049 Abstract classes ========================
+abstract class Controller {
+	abstract handle(req: any): void;
+
+	handleWithLogs(req: any) {
+		console.log('Start');
+		this.handle(req);
+		console.log('End');		
 	}
+}
 
-	isAdmin(): this is AdminBilder {
-		return this instanceof AdminBilder;
+class UserController extends Controller {
+	handle(req: any): void {
+		console.log(req);
+		
 	}
 }
+// new Controller() - error
 
-class AdminBilder extends UserBilder {
-	roles: string[];
-}
-
-const res = new UserBilder().setName('Vasia');
-const res2 = new AdminBilder().setName('Piter');
-
-let user: UserBilder | AdminBilder = new UserBilder();
-
-if (user.isAdmin()) {
-	console.log(user);	
-} else {
-	console.log(user);	
-}
+const c = new UserController();
+c.handleWithLogs('Request');
+c.handle('test');
