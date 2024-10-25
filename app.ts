@@ -975,40 +975,59 @@
 // }
 
 
-//============== 05_049 Abstract classes ========================
-abstract class Controller {
-	abstract handle(req: any): void;
+// //============== 05_049 Abstract classes ========================
+// abstract class Controller {
+// 	abstract handle(req: any): void;
 
-	handleWithLogs(req: any) {
-		console.log('Start');
-		this.handle(req);
-		console.log('End');		
-	}
-}
+// 	handleWithLogs(req: any) {
+// 		console.log('Start');
+// 		this.handle(req);
+// 		console.log('End');		
+// 	}
+// }
 
-class UserController extends Controller {
-	handle(req: any): void {
-		console.log(req);
+// class UserController extends Controller {
+// 	handle(req: any): void {
+// 		console.log(req);
 		
-	}
+// 	}
+// }
+// // new Controller() - error
+
+// const c = new UserController();
+// c.handleWithLogs('Request');
+// c.handle('test');
+
+
+// //============== 07_059 Example of built-in generic ========================
+// const num: Array<number> = [1, 2, 3];
+
+// async function test() {
+// 	const a = await new Promise<number>((resolve, reject) => {
+// 		resolve(1)
+// 	})
+// }
+
+// const check: Record<string, boolean> = {
+// 	drive: true,
+// 	kpp: false
+// }
+
+
+//============== 07_060 Writing function with generic ========================
+function logMiddleware<T>(data: T): T {
+	console.log(data);
+	return data;	
 }
-// new Controller() - error
 
-const c = new UserController();
-c.handleWithLogs('Request');
-c.handle('test');
+const res = logMiddleware<string>('10');
+const res2 = logMiddleware<number>(10);
 
-
-//============== 07_059 Example of built-in generic ========================
-const num: Array<number> = [1, 2, 3];
-
-async function test() {
-	const a = await new Promise<number>((resolve, reject) => {
-		resolve(1)
-	})
+function getSplitedHalf<T>(data: Array<T>): Array<T> {
+	const l = data.length / 2;
+	return data.splice(0, l);
 }
 
-const check: Record<string, boolean> = {
-	drive: true,
-	kpp: false
-}
+const s = getSplitedHalf<number>([1, 2, 3]);
+console.log(s);
+
