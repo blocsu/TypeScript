@@ -3,34 +3,13 @@
 // function getFullName(firstname: string, secondname: string): string {
 // 	return `${firstname} ${secondname}`
 // }
-class List {
-    constructor(items) {
-        this.items = items;
-    }
+const key = 'age';
+function getKey(obj, key) {
+    return obj[key];
 }
-class Accordion {
-}
-class ExtendedListClass extends List {
-    first() {
-        return this.items[0];
-    }
-}
-const list = new ExtendedListClass(['first', 'second']);
-console.log(list.first());
-//Mixin function
-function ExtendedList(Base) {
-    return class ExtendedList extends Base {
-        second() {
-            this.isOpened = true;
-            return this.items[1];
-        }
-    };
-}
-class AccordionList {
-    constructor(items) {
-        this.items = items;
-    }
-}
-const extendedList = ExtendedList(AccordionList);
-const res = new extendedList(['first', 'second']);
-console.log(res.second());
+const user = {
+    name: 'Vasia',
+    age: 30
+};
+const userName = (getKey(user, 'name'));
+console.log(userName);
