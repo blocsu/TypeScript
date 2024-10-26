@@ -754,20 +754,91 @@
 // } else {
 // 	console.log(user);	
 // }
-//============== 05_049 Abstract classes ========================
-class Controller {
-    handleWithLogs(req) {
-        console.log('Start');
-        this.handle(req);
-        console.log('End');
-    }
+// //============== 05_049 Abstract classes ========================
+// abstract class Controller {
+// 	abstract handle(req: any): void;
+// 	handleWithLogs(req: any) {
+// 		console.log('Start');
+// 		this.handle(req);
+// 		console.log('End');		
+// 	}
+// }
+// class UserController extends Controller {
+// 	handle(req: any): void {
+// 		console.log(req);
+// 	}
+// }
+// // new Controller() - error
+// const c = new UserController();
+// c.handleWithLogs('Request');
+// c.handle('test');
+// //============== 07_059 Example of built-in generic ========================
+// const num: Array<number> = [1, 2, 3];
+// async function test() {
+// 	const a = await new Promise<number>((resolve, reject) => {
+// 		resolve(1)
+// 	})
+// }
+// const check: Record<string, boolean> = {
+// 	drive: true,
+// 	kpp: false
+// }
+// //============== 07_060_062 Writing function with generic ========================
+// function logMiddleware<T>(data: T): T {
+// 	console.log(data);
+// 	return data;	
+// }
+// const res = logMiddleware<string>('10');
+// const res2 = logMiddleware<number>(10);
+// function getSplitedHalf<T>(data: Array<T>): Array<T> {
+// 	const l = data.length / 2;
+// 	return data.splice(0, l);
+// }
+// const s = getSplitedHalf<number>([1, 2, 3]);
+// console.log(s);
+// const split: <T>(data: Array<T>) => Array<T> = getSplitedHalf;
+// const split2: <Y>(data: Array<Y>) => Array<Y> = getSplitedHalf;
+// interface ILogLine<T> {
+// 	timeStamp: Date;
+// 	data: T;
+// }
+// const logLine: ILogLine<{a: number}> = {
+// 	timeStamp: new Date(),
+// 	data: {
+// 		a: 1
+// 	}
+// }
+// type logLineType<T> = {
+// 	timeStamp: Date;
+// 	data: T;
+// }
+// const logLine2: logLineType<{a: number}> = {
+// 	timeStamp: new Date(),
+// 	data: {
+// 		a: 1
+// 	}
+// }
+//============== 07_063 Limitation of generic ========================
+class Vehicle {
 }
-class UserController extends Controller {
-    handle(req) {
-        console.log(req);
-    }
+function kmToMiles(vehicle) {
+    vehicle.run = vehicle.run / 0.62;
+    return vehicle;
 }
-// new Controller() - error
-const c = new UserController();
-c.handleWithLogs('Request');
-c.handle('test');
+class LCV extends Vehicle {
+}
+const vehicle = kmToMiles(new Vehicle());
+const lcv = kmToMiles(new LCV());
+const v = kmToMiles({ run: 1 });
+console.log(vehicle);
+console.log(v);
+function kmToMiles2(vehicle) {
+    vehicle.run = vehicle.run / 0.62;
+    return vehicle;
+}
+function logId(id, additionalData) {
+    console.log(id);
+    console.log(additionalData);
+    return { id, data: additionalData };
+}
+logId('asas', 12);

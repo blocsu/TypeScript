@@ -1014,20 +1014,92 @@
 // }
 
 
-//============== 07_060 Writing function with generic ========================
-function logMiddleware<T>(data: T): T {
-	console.log(data);
-	return data;	
+// //============== 07_060_062 Writing function with generic ========================
+// function logMiddleware<T>(data: T): T {
+// 	console.log(data);
+// 	return data;	
+// }
+
+// const res = logMiddleware<string>('10');
+// const res2 = logMiddleware<number>(10);
+
+// function getSplitedHalf<T>(data: Array<T>): Array<T> {
+// 	const l = data.length / 2;
+// 	return data.splice(0, l);
+// }
+
+// const s = getSplitedHalf<number>([1, 2, 3]);
+// console.log(s);
+
+// const split: <T>(data: Array<T>) => Array<T> = getSplitedHalf;
+// const split2: <Y>(data: Array<Y>) => Array<Y> = getSplitedHalf;
+
+// interface ILogLine<T> {
+// 	timeStamp: Date;
+// 	data: T;
+// }
+
+// const logLine: ILogLine<{a: number}> = {
+// 	timeStamp: new Date(),
+// 	data: {
+// 		a: 1
+// 	}
+// }
+
+
+// type logLineType<T> = {
+// 	timeStamp: Date;
+// 	data: T;
+// }
+
+// const logLine2: logLineType<{a: number}> = {
+// 	timeStamp: new Date(),
+// 	data: {
+// 		a: 1
+// 	}
+// }
+
+
+
+//============== 07_063 Limitation of generic ========================
+class Vehicle {
+	run: number;
 }
 
-const res = logMiddleware<string>('10');
-const res2 = logMiddleware<number>(10);
-
-function getSplitedHalf<T>(data: Array<T>): Array<T> {
-	const l = data.length / 2;
-	return data.splice(0, l);
+function kmToMiles<T extends Vehicle>(vehicle: T): T {
+	vehicle.run = vehicle.run / 0.62;
+	return vehicle;
 }
 
-const s = getSplitedHalf<number>([1, 2, 3]);
-console.log(s);
+class LCV extends Vehicle {
+	capacity: number;
+}
 
+const vehicle = kmToMiles(new Vehicle());
+const lcv = kmToMiles(new LCV());
+const v = kmToMiles({run: 1})
+console.log(vehicle);
+console.log(v);
+
+
+interface IVehicle {
+	run: number;
+}
+
+function kmToMiles2<T extends IVehicle>(vehicle: T): T {
+	vehicle.run = vehicle.run / 0.62;
+	return vehicle;
+}
+
+interface ILCV extends IVehicle {
+	capacity: number;
+}
+
+
+function logId <T extends string | number, Y> (id: T, additionalData: Y): {id: T, data: Y} {
+	console.log(id);
+	console.log(additionalData);
+	return {id, data: additionalData};	
+}
+
+logId('asas', 12);
