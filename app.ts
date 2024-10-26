@@ -1061,83 +1061,128 @@
 
 
 
-//============== 07_063 Limitation of generic ========================
-class Vehicle {
-	run: number;
-}
+// //============== 07_063 Limitation of generic ========================
+// class Vehicle {
+// 	run: number;
+// }
 
-function kmToMiles<T extends Vehicle>(vehicle: T): T {
-	vehicle.run = vehicle.run / 0.62;
-	return vehicle;
-}
+// function kmToMiles<T extends Vehicle>(vehicle: T): T {
+// 	vehicle.run = vehicle.run / 0.62;
+// 	return vehicle;
+// }
 
-class LCV extends Vehicle {
-	capacity: number;
-}
+// class LCV extends Vehicle {
+// 	capacity: number;
+// }
 
-const vehicle = kmToMiles(new Vehicle());
-const lcv = kmToMiles(new LCV());
-const v = kmToMiles({run: 1})
-console.log(vehicle);
-console.log(v);
-
-
-interface IVehicle {
-	run: number;
-}
-
-function kmToMiles2<T extends IVehicle>(vehicle: T): T {
-	vehicle.run = vehicle.run / 0.62;
-	return vehicle;
-}
-
-interface ILCV extends IVehicle {
-	capacity: number;
-}
+// const vehicle = kmToMiles(new Vehicle());
+// const lcv = kmToMiles(new LCV());
+// const v = kmToMiles({run: 1})
+// console.log(vehicle);
+// console.log(v);
 
 
-function logId <T extends string | number, Y> (id: T, additionalData: Y): {id: T, data: Y} {
-	console.log(id);
-	console.log(additionalData);
-	return {id, data: additionalData};	
-}
+// interface IVehicle {
+// 	run: number;
+// }
 
-logId('asas', 12);
+// function kmToMiles2<T extends IVehicle>(vehicle: T): T {
+// 	vehicle.run = vehicle.run / 0.62;
+// 	return vehicle;
+// }
+
+// interface ILCV extends IVehicle {
+// 	capacity: number;
+// }
 
 
-//============== 07_065 Generic classes ========================
-class Resp<D, E> {
-	data?: D;
-	error?: E;
+// function logId <T extends string | number, Y> (id: T, additionalData: Y): {id: T, data: Y} {
+// 	console.log(id);
+// 	console.log(additionalData);
+// 	return {id, data: additionalData};	
+// }
 
-	constructor(data?: D, error?: E) {
-		if (data) {
-			this.data = data;
-		}
-		if (error) {
-			this.error = error;
-		}
-	}
-}
+// logId('asas', 12);
 
-const res = new Resp<string, number>('data');
-res.error
 
-// class httpResp extends Resp<string, number> {
-// 	code: number;
+// //============== 07_065 Generic classes ========================
+// class Resp<D, E> {
+// 	data?: D;
+// 	error?: E;
 
-// 	setCode(code: number) {
+// 	constructor(data?: D, error?: E) {
+// 		if (data) {
+// 			this.data = data;
+// 		}
+// 		if (error) {
+// 			this.error = error;
+// 		}
+// 	}
+// }
+
+// const res = new Resp<string, number>('data');
+// res.error
+
+// // class httpResp extends Resp<string, number> {
+// // 	code: number;
+
+// // 	setCode(code: number) {
+// // 		this.code = code;
+// // 	}
+// // }
+
+// class httpResp<F> extends Resp<string, number> {
+// 	code: F;
+
+// 	setCode(code: F) {
 // 		this.code = code;
 // 	}
 // }
 
-class httpResp<F> extends Resp<string, number> {
-	code: F;
+// const res2 = new httpResp();
+// res2.data
 
-	setCode(code: F) {
-		this.code = code;
+
+//============== 07_066 Mixins ========================
+type Constructor = new (...args: any[]) => {}
+type GConstructor<T = {}> = new (...args: any[]) => T
+
+class List {
+	constructor(public items: string[]) {}
+}
+
+class Accordion {
+	isOpened: boolean;
+}
+
+type ListType = GConstructor<List>;
+type AccordionType = GConstructor<Accordion>
+
+class ExtendedListClass extends List {
+	first() {
+		return this.items[0];
 	}
 }
 
-const res2 = new httpResp();
-res2.data
+const list = new ExtendedListClass(['first', 'second']);
+console.log(list.first());
+
+//Mixin function
+function ExtendedList<TBase extends ListType & AccordionType>(Base: TBase) {
+	return class ExtendedList extends Base {
+		second() {
+			this.isOpened = true;
+			return this.items[1];
+		}
+	}
+}
+
+class AccordionList {
+	isOpened: boolean;
+	constructor(public items: string[]) {}
+}
+
+const extendedList = ExtendedList(AccordionList);
+const res = new extendedList(['first', 'second']);
+console.log(res.second());
+

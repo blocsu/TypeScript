@@ -19,8 +19,8 @@ const data2 = [
     [2, 3],
     [1, 4]
 ];
-console.log(sort(data, 'desc'));
-console.log(sort(data));
-const d = data2.flatMap((data) => Array.isArray(data) ? data : [data]);
-console.log(d);
-console.log(data2.flat());
+// console.log(sort(data, 'desc'));
+// console.log(sort(data));
+// const d: number[] = data2.flatMap((data) => Array.isArray(data) ? data : [data]);
+// console.log(d);
+// console.log(data2.flat());
