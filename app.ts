@@ -1211,33 +1211,74 @@
 // console.log(userName);
 
 
-//============== 08_068 Typeof ========================
-let strOrNum: string | number = 5;
 
-if (Math.random() > 5) {
-	strOrNum = 5;
-} else {
-	strOrNum = 'str';
+
+
+// //============== 08_070 Typeof ========================
+// let strOrNum: string | number = 5;
+
+// if (Math.random() > 5) {
+// 	strOrNum = 5;
+// } else {
+// 	strOrNum = 'str';
+// }
+
+// if (typeof strOrNum === 'string') {
+// 	console.log(strOrNum);	
+// } else {
+// 	console.log(strOrNum);	
+// }
+
+// let str2OrNum: typeof strOrNum;
+
+// const user = {
+// 	name: 'Vasai',
+// 	age: 30
+// }
+
+// type keyOfUser = keyof typeof user;
+
+// enum Direction {
+// 	Up,
+// 	Down
+// }
+
+// type d = keyof typeof Direction;
+
+
+//============== 08_071 Indexed Access Types ========================
+interface Role {
+	name: string;
 }
 
-if (typeof strOrNum === 'string') {
-	console.log(strOrNum);	
-} else {
-	console.log(strOrNum);	
+interface Permission {
+	endDate: Date;
 }
 
-let str2OrNum: typeof strOrNum;
-
-const user = {
-	name: 'Vasai',
-	age: 30
+interface User {
+	name: string;
+	roles: Role[];
+	permission: Permission;
 }
 
-type keyOfUser = keyof typeof user;
-
-enum Direction {
-	Up,
-	Down
+const user: User = {
+	name: 'Vasia',
+	roles: [],
+	permission: {
+		endDate: new Date()
+	}
 }
 
-type d = keyof typeof Direction;
+const nameUser = user['name'];
+const roleUser = 'roles';
+// let roleUser: 'roles' = 'roles';
+
+type rolesType = User['roles'];
+type roles2Type = User[typeof roleUser];
+
+//[number] позволяет получить доступ к обобщенному типу массива
+type roleType = User['roles'][number];
+type dateType = User['permission']['endDate'];
+
+const roles = ['admin', 'user', 'super-user'] as const;
+type role = typeof roles[number];
