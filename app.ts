@@ -1188,25 +1188,56 @@
 
 
 
-//============== 08_068 Keyof ========================
-interface IUser {
-	name: string;
-	age: number;
+// //============== 08_068 Keyof ========================
+// interface IUser {
+// 	name: string;
+// 	age: number;
+// }
+
+// type keyOfUser = keyof IUser;
+
+// const key: keyOfUser = 'age';
+
+// function getKey<T, K extends keyof T>(obj: T, key: K) {
+// 	return obj[key]
+// }
+
+// const user: IUser = {
+// 	name: 'Vasia',
+// 	age: 30
+// }
+
+// const userName = (getKey(user, 'name'));
+// console.log(userName);
+
+
+//============== 08_068 Typeof ========================
+let strOrNum: string | number = 5;
+
+if (Math.random() > 5) {
+	strOrNum = 5;
+} else {
+	strOrNum = 'str';
 }
 
-type keyOfUser = keyof IUser;
-
-const key: keyOfUser = 'age';
-
-function getKey<T, K extends keyof T>(obj: T, key: K) {
-	return obj[key]
+if (typeof strOrNum === 'string') {
+	console.log(strOrNum);	
+} else {
+	console.log(strOrNum);	
 }
 
-const user: IUser = {
-	name: 'Vasia',
+let str2OrNum: typeof strOrNum;
+
+const user = {
+	name: 'Vasai',
 	age: 30
 }
 
-const userName = (getKey(user, 'name'));
-console.log(userName);
+type keyOfUser = keyof typeof user;
 
+enum Direction {
+	Up,
+	Down
+}
+
+type d = keyof typeof Direction;
