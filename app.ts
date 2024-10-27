@@ -1246,39 +1246,99 @@
 // type d = keyof typeof Direction;
 
 
-//============== 08_071 Indexed Access Types ========================
-interface Role {
+// //============== 08_071 Indexed Access Types ========================
+// interface Role {
+// 	name: string;
+// }
+
+// interface Permission {
+// 	endDate: Date;
+// }
+
+// interface User {
+// 	name: string;
+// 	roles: Role[];
+// 	permission: Permission;
+// }
+
+// const user: User = {
+// 	name: 'Vasia',
+// 	roles: [],
+// 	permission: {
+// 		endDate: new Date()
+// 	}
+// }
+
+// const nameUser = user['name'];
+// const roleUser = 'roles';
+// // let roleUser: 'roles' = 'roles';
+
+// type rolesType = User['roles'];
+// type roles2Type = User[typeof roleUser];
+
+// //[number] позволяет получить доступ к обобщенному типу массива
+// type roleType = User['roles'][number];
+// type dateType = User['permission']['endDate'];
+
+// const roles = ['admin', 'user', 'super-user'] as const;
+// type role = typeof roles[number];
+
+
+//============== 08_072 Conditional Types ========================
+const a: number = Math.random() > 0.5 ? 1 :0;
+
+// interface HTTPResponce<T, V> {
+// 	code: number;
+// 	data: T;
+// 	data2: V;
+// }
+
+//Первый случай использования Conditional Types
+interface HTTPResponce<T extends 'success' | 'failed'> {
+	code: number;
+	data: T extends 'success' ? string : Error;
+	// data2: T extends 'failed' ? string : number;
+}
+
+const suc: HTTPResponce<'success'> = {
+	code: 200,
+	data: 'done'
+}
+
+const err: HTTPResponce<'failed'> = {
+	code: 400,
+	data: new Error
+}
+
+//второй случай использования Conditional Types замена overload
+class User {
+	id: number;
 	name: string;
 }
 
-interface Permission {
-	endDate: Date;
+class UserPersistent extends User {
+	dbid: string;
 }
 
-interface User {
-	name: string;
-	roles: Role[];
-	permission: Permission;
-}
-
-const user: User = {
-	name: 'Vasia',
-	roles: [],
-	permission: {
-		endDate: new Date()
+function getUser(id: number): User;
+function getUser(dbid: string): UserPersistent;
+function getUser(idOrDbid: number | string): User | UserPersistent {
+	if (typeof idOrDbid === 'number') {
+		return new User();
+	} else {
+		return new UserPersistent();
 	}
 }
 
-const nameUser = user['name'];
-const roleUser = 'roles';
-// let roleUser: 'roles' = 'roles';
+type UserOrUserPersistent<T extends number | string> = T extends number ? User : UserPersistent;
 
-type rolesType = User['roles'];
-type roles2Type = User[typeof roleUser];
+function getUser2<T extends number | string>(id: T): UserOrUserPersistent<T> {
+	if (typeof id === 'number') {
+		return new User() as UserOrUserPersistent<T>;
+	} else {
+		return new UserPersistent() as UserOrUserPersistent<T>;
+	}
+}
 
-//[number] позволяет получить доступ к обобщенному типу массива
-type roleType = User['roles'][number];
-type dateType = User['permission']['endDate'];
-
-const roles = ['admin', 'user', 'super-user'] as const;
-type role = typeof roles[number];
+const res2 = getUser2(1);
+const res3 = getUser2('gdgf');
