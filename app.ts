@@ -1366,26 +1366,48 @@
 // runTransaction(transaction);
 
 
-//============== 08_074 Mapped Types ========================
-type Modifier = 'read' | 'update' | 'create';
+// //============== 08_074 Mapped Types ========================
+// type Modifier = 'read' | 'update' | 'create';
 
-type UserRoles = {
-	customers?: Modifier,
-	projects?: Modifier,
-	adminPanel?: Modifier,
+// type UserRoles = {
+// 	customers?: Modifier,
+// 	projects?: Modifier,
+// 	adminPanel?: Modifier,
+// }
+
+// //Mapped Types
+// type ModifierToAccess<Type> = {
+// 	+readonly [Property in keyof Type as Exclude<`canAccess${string & Property}`, 'canAccessadminPanel' | 'canAccessprojects'>]-?: boolean;
+// }
+
+// //При изменении UserRoles тоже изменится
+// type UserAccess2 = ModifierToAccess<UserRoles>;
+
+// //При изменении UserRoles не получим уведомление что и этот тип нужно изменить
+// type UserAccess1 = {
+// 	customers?: boolean,
+// 	projects?: boolean,
+// 	adminPanel?: boolean,
+// }
+
+
+
+//============== 08_076 Template Literal Types ========================
+type ReadOrWrite = 'read' | 'write';
+type Bulk = 'bulk' | '';
+
+type Access = `can${Capitalize<ReadOrWrite>}${Capitalize<Bulk>}`;
+
+type ReadOrWriteBulk<T> = T extends `can${infer R}` ? R : never;
+
+type T = ReadOrWriteBulk<Access>;
+
+type ErrorOrSuccess = 'error' | 'success';
+
+type ResponceT = {
+	result: `http${Capitalize<ErrorOrSuccess>}`;
 }
 
-//Mapped Types
-type ModifierToAccess<Type> = {
-	+readonly [Property in keyof Type as Exclude<`canAccess${string & Property}`, 'canAccessadminPanel' | 'canAccessprojects'>]-?: boolean;
-}
-
-//При изменении UserRoles тоже изменится
-type UserAccess2 = ModifierToAccess<UserRoles>;
-
-//При изменении UserRoles не получим уведомление что и этот тип нужно изменить
-type UserAccess1 = {
-	customers?: boolean,
-	projects?: boolean,
-	adminPanel?: boolean,
+const a: ResponceT = {
+	result: 'httpSuccess'
 }
