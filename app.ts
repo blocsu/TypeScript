@@ -1284,84 +1284,108 @@
 // type role = typeof roles[number];
 
 
-//============== 08_072 Conditional Types ========================
-const a: number = Math.random() > 0.5 ? 1 :0;
+// //============== 08_072 Conditional Types ========================
+// const a: number = Math.random() > 0.5 ? 1 :0;
 
-// interface HTTPResponce<T, V> {
+// // interface HTTPResponce<T, V> {
+// // 	code: number;
+// // 	data: T;
+// // 	data2: V;
+// // }
+
+// //Первый случай использования Conditional Types
+// interface HTTPResponce<T extends 'success' | 'failed'> {
 // 	code: number;
-// 	data: T;
-// 	data2: V;
+// 	data: T extends 'success' ? string : Error;
+// 	// data2: T extends 'failed' ? string : number;
 // }
 
-//Первый случай использования Conditional Types
-interface HTTPResponce<T extends 'success' | 'failed'> {
-	code: number;
-	data: T extends 'success' ? string : Error;
-	// data2: T extends 'failed' ? string : number;
-}
-
-const suc: HTTPResponce<'success'> = {
-	code: 200,
-	data: 'done'
-}
-
-const err: HTTPResponce<'failed'> = {
-	code: 400,
-	data: new Error
-}
-
-//второй случай использования Conditional Types замена overload
-class User {
-	id: number;
-	name: string;
-}
-
-class UserPersistent extends User {
-	dbid: string;
-}
-
-function getUser(id: number): User;
-function getUser(dbid: string): UserPersistent;
-function getUser(idOrDbid: number | string): User | UserPersistent {
-	if (typeof idOrDbid === 'number') {
-		return new User();
-	} else {
-		return new UserPersistent();
-	}
-}
-
-type UserOrUserPersistent<T extends number | string> = T extends number ? User : UserPersistent;
-
-function getUser2<T extends number | string>(id: T): UserOrUserPersistent<T> {
-	if (typeof id === 'number') {
-		return new User() as UserOrUserPersistent<T>;
-	} else {
-		return new UserPersistent() as UserOrUserPersistent<T>;
-	}
-}
-
-const res2 = getUser2(1);
-const res3 = getUser2('gdgf');
-
-
-//============== 08_073 Infer ========================
-function runTransaction(Transaction: {
-	fromTo: [string, string]
-}) {
-	console.log(Transaction);	
-}
-
-// //Хардкорный вариант решения типизации
-// const transaction = {
-// 	fromTo: ['1', '2'] as [string, string]
+// const suc: HTTPResponce<'success'> = {
+// 	code: 200,
+// 	data: 'done'
 // }
 
-//Предпочтительный вариант
-type GetFirstArg<T> =T extends (first: infer First, ...args: any[]) => any ? First : never;
+// const err: HTTPResponce<'failed'> = {
+// 	code: 400,
+// 	data: new Error
+// }
 
-const transaction: GetFirstArg<typeof runTransaction> = {
-	fromTo: ['1', '2']
+// //второй случай использования Conditional Types замена overload
+// class User {
+// 	id: number;
+// 	name: string;
+// }
+
+// class UserPersistent extends User {
+// 	dbid: string;
+// }
+
+// function getUser(id: number): User;
+// function getUser(dbid: string): UserPersistent;
+// function getUser(idOrDbid: number | string): User | UserPersistent {
+// 	if (typeof idOrDbid === 'number') {
+// 		return new User();
+// 	} else {
+// 		return new UserPersistent();
+// 	}
+// }
+
+// type UserOrUserPersistent<T extends number | string> = T extends number ? User : UserPersistent;
+
+// function getUser2<T extends number | string>(id: T): UserOrUserPersistent<T> {
+// 	if (typeof id === 'number') {
+// 		return new User() as UserOrUserPersistent<T>;
+// 	} else {
+// 		return new UserPersistent() as UserOrUserPersistent<T>;
+// 	}
+// }
+
+// const res2 = getUser2(1);
+// const res3 = getUser2('gdgf');
+
+
+// //============== 08_073 Infer ========================
+// function runTransaction(Transaction: {
+// 	fromTo: [string, string]
+// }) {
+// 	console.log(Transaction);	
+// }
+
+// // //Хардкорный вариант решения типизации
+// // const transaction = {
+// // 	fromTo: ['1', '2'] as [string, string]
+// // }
+
+// //Предпочтительный вариант
+// type GetFirstArg<T> =T extends (first: infer First, ...args: any[]) => any ? First : never;
+
+// const transaction: GetFirstArg<typeof runTransaction> = {
+// 	fromTo: ['1', '2']
+// }
+
+// runTransaction(transaction);
+
+
+//============== 08_074 Mapped Types ========================
+type Modifier = 'read' | 'update' | 'create';
+
+type UserRoles = {
+	customers?: Modifier,
+	projects?: Modifier,
+	adminPanel?: Modifier,
 }
 
-runTransaction(transaction);
+//Mapped Types
+type ModifierToAccess<Type> = {
+	+readonly [Property in keyof Type as Exclude<`canAccess${string & Property}`, 'canAccessadminPanel' | 'canAccessprojects'>]-?: boolean;
+}
 
+//При изменении UserRoles тоже изменится
+type UserAccess2 = ModifierToAccess<UserRoles>;
+
+//При изменении UserRoles не получим уведомление что и этот тип нужно изменить
+type UserAccess1 = {
+	customers?: boolean,
+	projects?: boolean,
+	adminPanel?: boolean,
+}
