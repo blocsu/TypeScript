@@ -1013,6 +1013,12 @@ function getUser2(id) {
     }
 }
 const res2 = getUser2(1);
-console.log(res2);
 const res3 = getUser2('gdgf');
-console.log(res3);
+//============== 08_073 Infer ========================
+function runTransaction(Transaction) {
+    console.log(Transaction);
+}
+const transaction = {
+    fromTo: ['1', '2']
+};
+runTransaction(transaction);

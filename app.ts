@@ -1342,3 +1342,26 @@ function getUser2<T extends number | string>(id: T): UserOrUserPersistent<T> {
 
 const res2 = getUser2(1);
 const res3 = getUser2('gdgf');
+
+
+//============== 08_073 Infer ========================
+function runTransaction(Transaction: {
+	fromTo: [string, string]
+}) {
+	console.log(Transaction);	
+}
+
+// //Хардкорный вариант решения типизации
+// const transaction = {
+// 	fromTo: ['1', '2'] as [string, string]
+// }
+
+//Предпочтительный вариант
+type GetFirstArg<T> =T extends (first: infer First, ...args: any[]) => any ? First : never;
+
+const transaction: GetFirstArg<typeof runTransaction> = {
+	fromTo: ['1', '2']
+}
+
+runTransaction(transaction);
+
