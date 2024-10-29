@@ -1392,22 +1392,53 @@
 
 
 
+// //============== 08_076 Template Literal Types ========================
+// type ReadOrWrite = 'read' | 'write';
+// type Bulk = 'bulk' | '';
+
+// type Access = `can${Capitalize<ReadOrWrite>}${Capitalize<Bulk>}`;
+
+// type ReadOrWriteBulk<T> = T extends `can${infer R}` ? R : never;
+
+// type T = ReadOrWriteBulk<Access>;
+
+// type ErrorOrSuccess = 'error' | 'success';
+
+// type ResponceT = {
+// 	result: `http${Capitalize<ErrorOrSuccess>}`;
+// }
+
+// const a: ResponceT = {
+// 	result: 'httpSuccess'
+// }
+
+
 //============== 08_076 Template Literal Types ========================
-type ReadOrWrite = 'read' | 'write';
-type Bulk = 'bulk' | '';
-
-type Access = `can${Capitalize<ReadOrWrite>}${Capitalize<Bulk>}`;
-
-type ReadOrWriteBulk<T> = T extends `can${infer R}` ? R : never;
-
-type T = ReadOrWriteBulk<Access>;
-
-type ErrorOrSuccess = 'error' | 'success';
-
-type ResponceT = {
-	result: `http${Capitalize<ErrorOrSuccess>}`;
+interface User {
+	neme: string;
+	age?: number;
+	email: string;
 }
 
-const a: ResponceT = {
-	result: 'httpSuccess'
+type partial = Partial<User>;
+const p: partial = {};
+
+type required = Required<User>;
+type readonly = Readonly<User>;
+type requiredAndReadonly = Required<Readonly<User>>;
+
+
+//============== 08_079 Pick, Omit, Extract, Exclude ========================
+interface PaymentPersistent {
+	id: number;
+	sum: number;
+	from: string;
+	to: string;
 }
+
+type Payment = Omit<PaymentPersistent, 'id'>;
+type PaymentRequisits = Pick<PaymentPersistent, 'from' | 'to'>;
+
+type ExtractEx = Extract<'from' | 'to' | Payment, string>;
+type ExcludeEx = Exclude<'from' | 'to' | Payment, string>;
+
