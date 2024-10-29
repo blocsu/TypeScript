@@ -1461,3 +1461,58 @@ type PT = Parameters<typeof getData>[0];//Возвращает кортеж па
 
 type CP = ConstructorParameters<typeof User>;//[id: number, name: string]
 type IT = InstanceType<typeof User>;
+
+
+//============== 08_081 Awaited ========================
+type A = Awaited<Promise<string>>;//string
+type A2 = Awaited<Promise<Promise<string>>>;//string
+
+//Пример использования Awaited
+interface IMenu {
+	name: string;
+	url: string
+}
+
+async function getMenu(): Promise<IMenu[]> {
+	return [{name: 'Аналитика', url: 'Analitics'}];
+}
+
+type R = Awaited<ReturnType<typeof getMenu>>;
+
+async function  getArray<T>(x: T): Promise<Awaited<T>[]> {
+	return [await x];
+}
+
+//До появления Awaited вытаскивался не совсем корректный тип
+async function  getArray2<T>(x: T): Promise<T[]> {
+	return [await x];
+}
+
+
+//============== 08_083 Decorator's pattern ========================
+interface IUserService {
+	users: number;
+	getUsersInDatabase(): number;
+}
+
+class UserService implements IUserService {
+	users: number = 1000;
+	getUsersInDatabase(): number {
+		return this.users;
+	}	
+}
+
+function nullUsers (obj: IUserService) {
+	obj.users = 0;
+	return obj;
+}
+
+function logUsers(obj: IUserService) {
+	console.log('Users: ' + obj.users);
+	return obj;
+}
+
+console.log(new UserService().getUsersInDatabase());
+console.log(nullUsers(new UserService()).getUsersInDatabase());
+console.log(logUsers(nullUsers(new UserService())).getUsersInDatabase());
+console.log(nullUsers(logUsers(new UserService())).getUsersInDatabase());
