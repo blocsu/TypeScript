@@ -1442,3 +1442,22 @@ type PaymentRequisits = Pick<PaymentPersistent, 'from' | 'to'>;
 type ExtractEx = Extract<'from' | 'to' | Payment, string>;
 type ExcludeEx = Exclude<'from' | 'to' | Payment, string>;
 
+
+//============== 08_080 ReturnType, Parameters, ConstructorParameters ========================
+class User {
+	constructor(public id: number, public name: string) {}
+}
+
+function getData(id: number): User {
+	return new User(id, 'Vasia');
+}
+
+type RT = ReturnType<typeof getData>;//User
+type RT2 = ReturnType<() => void>;//void
+type RT3 = ReturnType<<T>() => T>;//unknown
+type RT4 = ReturnType<<T extends string>() => T>;//string
+
+type PT = Parameters<typeof getData>[0];//Возвращает кортеж параметров поэтому извлекаем тип по индексу [0]
+
+type CP = ConstructorParameters<typeof User>;//[id: number, name: string]
+type IT = InstanceType<typeof User>;
