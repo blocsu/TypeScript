@@ -1413,88 +1413,119 @@
 // }
 
 
-//============== 08_076 Template Literal Types ========================
-interface User {
-	neme: string;
-	age?: number;
-	email: string;
-}
+// //============== 08_076 Template Literal Types ========================
+// interface User {
+// 	neme: string;
+// 	age?: number;
+// 	email: string;
+// }
 
-type partial = Partial<User>;
-const p: partial = {};
+// type partial = Partial<User>;
+// const p: partial = {};
 
-type required = Required<User>;
-type readonly = Readonly<User>;
-type requiredAndReadonly = Required<Readonly<User>>;
-
-
-//============== 08_079 Pick, Omit, Extract, Exclude ========================
-interface PaymentPersistent {
-	id: number;
-	sum: number;
-	from: string;
-	to: string;
-}
-
-type Payment = Omit<PaymentPersistent, 'id'>;
-type PaymentRequisits = Pick<PaymentPersistent, 'from' | 'to'>;
-
-type ExtractEx = Extract<'from' | 'to' | Payment, string>;
-type ExcludeEx = Exclude<'from' | 'to' | Payment, string>;
+// type required = Required<User>;
+// type readonly = Readonly<User>;
+// type requiredAndReadonly = Required<Readonly<User>>;
 
 
-//============== 08_080 ReturnType, Parameters, ConstructorParameters ========================
-class User {
-	constructor(public id: number, public name: string) {}
-}
+// //============== 08_079 Pick, Omit, Extract, Exclude ========================
+// interface PaymentPersistent {
+// 	id: number;
+// 	sum: number;
+// 	from: string;
+// 	to: string;
+// }
 
-function getData(id: number): User {
-	return new User(id, 'Vasia');
-}
+// type Payment = Omit<PaymentPersistent, 'id'>;
+// type PaymentRequisits = Pick<PaymentPersistent, 'from' | 'to'>;
 
-type RT = ReturnType<typeof getData>;//User
-type RT2 = ReturnType<() => void>;//void
-type RT3 = ReturnType<<T>() => T>;//unknown
-type RT4 = ReturnType<<T extends string>() => T>;//string
-
-type PT = Parameters<typeof getData>[0];//Возвращает кортеж параметров поэтому извлекаем тип по индексу [0]
-
-type CP = ConstructorParameters<typeof User>;//[id: number, name: string]
-type IT = InstanceType<typeof User>;
+// type ExtractEx = Extract<'from' | 'to' | Payment, string>;
+// type ExcludeEx = Exclude<'from' | 'to' | Payment, string>;
 
 
-//============== 08_081 Awaited ========================
-type A = Awaited<Promise<string>>;//string
-type A2 = Awaited<Promise<Promise<string>>>;//string
+// //============== 08_080 ReturnType, Parameters, ConstructorParameters ========================
+// class User {
+// 	constructor(public id: number, public name: string) {}
+// }
 
-//Пример использования Awaited
-interface IMenu {
-	name: string;
-	url: string
-}
+// function getData(id: number): User {
+// 	return new User(id, 'Vasia');
+// }
 
-async function getMenu(): Promise<IMenu[]> {
-	return [{name: 'Аналитика', url: 'Analitics'}];
-}
+// type RT = ReturnType<typeof getData>;//User
+// type RT2 = ReturnType<() => void>;//void
+// type RT3 = ReturnType<<T>() => T>;//unknown
+// type RT4 = ReturnType<<T extends string>() => T>;//string
 
-type R = Awaited<ReturnType<typeof getMenu>>;
+// type PT = Parameters<typeof getData>[0];//Возвращает кортеж параметров поэтому извлекаем тип по индексу [0]
 
-async function  getArray<T>(x: T): Promise<Awaited<T>[]> {
-	return [await x];
-}
-
-//До появления Awaited вытаскивался не совсем корректный тип
-async function  getArray2<T>(x: T): Promise<T[]> {
-	return [await x];
-}
+// type CP = ConstructorParameters<typeof User>;//[id: number, name: string]
+// type IT = InstanceType<typeof User>;
 
 
-//============== 08_083 Decorator's pattern ========================
+// //============== 08_081 Awaited ========================
+// type A = Awaited<Promise<string>>;//string
+// type A2 = Awaited<Promise<Promise<string>>>;//string
+
+// //Пример использования Awaited
+// interface IMenu {
+// 	name: string;
+// 	url: string
+// }
+
+// async function getMenu(): Promise<IMenu[]> {
+// 	return [{name: 'Аналитика', url: 'Analitics'}];
+// }
+
+// type R = Awaited<ReturnType<typeof getMenu>>;
+
+// async function  getArray<T>(x: T): Promise<Awaited<T>[]> {
+// 	return [await x];
+// }
+
+// //До появления Awaited вытаскивался не совсем корректный тип
+// async function  getArray2<T>(x: T): Promise<T[]> {
+// 	return [await x];
+// }
+
+
+// //============== 08_083 Decorator's pattern ========================
+// interface IUserService {
+// 	users: number;
+// 	getUsersInDatabase(): number;
+// }
+
+// class UserService implements IUserService {
+// 	users: number = 1000;
+// 	getUsersInDatabase(): number {
+// 		return this.users;
+// 	}	
+// }
+
+// function nullUsers (obj: IUserService) {
+// 	obj.users = 0;
+// 	return obj;
+// }
+
+// function logUsers(obj: IUserService) {
+// 	console.log('Users: ' + obj.users);
+// 	return obj;
+// }
+
+// console.log(new UserService().getUsersInDatabase());
+// console.log(nullUsers(new UserService()).getUsersInDatabase());
+// console.log(logUsers(nullUsers(new UserService())).getUsersInDatabase());
+// console.log(nullUsers(logUsers(new UserService())).getUsersInDatabase());
+
+
+//============== 08_084 Decorator of class ========================
 interface IUserService {
 	users: number;
 	getUsersInDatabase(): number;
 }
 
+@threeUserAdvanced
+@nullUsers
 class UserService implements IUserService {
 	users: number = 1000;
 	getUsersInDatabase(): number {
@@ -1502,17 +1533,14 @@ class UserService implements IUserService {
 	}	
 }
 
-function nullUsers (obj: IUserService) {
-	obj.users = 0;
-	return obj;
+function nullUsers (target: Function) {
+	target.prototype.users = 0;
 }
 
-function logUsers(obj: IUserService) {
-	console.log('Users: ' + obj.users);
-	return obj;
+function threeUserAdvanced<T extends {new(...args: any[]): {} }>(constructor: T) {
+	return class extends constructor {
+		users = 3;
+	}
 }
 
 console.log(new UserService().getUsersInDatabase());
-console.log(nullUsers(new UserService()).getUsersInDatabase());
-console.log(logUsers(nullUsers(new UserService())).getUsersInDatabase());
-console.log(nullUsers(logUsers(new UserService())).getUsersInDatabase());
