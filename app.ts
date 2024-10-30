@@ -1518,14 +1518,45 @@
 // console.log(nullUsers(logUsers(new UserService())).getUsersInDatabase());
 
 
-//============== 08_084 Decorator of class ========================
+// //============== 08_084 Decorator of class ========================
+// interface IUserService {
+// 	users: number;
+// 	getUsersInDatabase(): number;
+// }
+
+// @threeUserAdvanced
+// @nullUsers
+// class UserService implements IUserService {
+// 	users: number = 1000;
+// 	getUsersInDatabase(): number {
+// 		return this.users;
+// 	}	
+// }
+
+// function nullUsers (target: Function) {
+// 	target.prototype.users = 0;
+// }
+
+// function threeUserAdvanced<T extends {new(...args: any[]): {} }>(constructor: T) {
+// 	return class extends constructor {
+// 		users = 3;
+// 	}
+// }
+
+// console.log(new UserService().getUsersInDatabase());
+
+
+//============== 08_085 Fabric of decorators ========================
 interface IUserService {
 	users: number;
 	getUsersInDatabase(): number;
 }
 
-@threeUserAdvanced
-@nullUsers
+// @setUsersAdvanced(4)
+// @threeUserAdvanced
+@log()
+@setUsers(2)
+// @nullUsers
 class UserService implements IUserService {
 	users: number = 1000;
 	getUsersInDatabase(): number {
@@ -1535,6 +1566,30 @@ class UserService implements IUserService {
 
 function nullUsers (target: Function) {
 	target.prototype.users = 0;
+}
+
+function setUsers(users: number) {
+	console.log('setUsers init');	
+	return (target: Function) => {
+		console.log('setUsers run');		
+		target.prototype.users = users;
+	}
+}
+
+function log() {
+	console.log('log init');
+	return (target: Function) => {
+		console.log('log run');
+		console.log(target);
+	}
+}
+
+function setUsersAdvanced(users: number) {
+	return <T extends {new(...args: any[]): {} }>(constructor: T) => {
+		return class extends constructor {
+			users = users;
+		}
+	}
 }
 
 function threeUserAdvanced<T extends {new(...args: any[]): {} }>(constructor: T) {
