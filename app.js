@@ -9,56 +9,36 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-// @setUsersAdvanced(4)
-// @threeUserAdvanced
-let UserService = 
-// @nullUsers
 class UserService {
-    constructor() {
-        this.users = 1000;
-    }
     getUsersInDatabase() {
-        return this.users;
+        throw new Error('Ошибка');
     }
-};
-UserService = __decorate([
-    log(),
-    setUsers(2)
-    // @nullUsers
-], UserService);
-function nullUsers(target) {
-    target.prototype.users = 0;
 }
-function setUsers(users) {
-    console.log('setUsers init');
-    return (target) => {
-        console.log('setUsers run');
-        target.prototype.users = users;
-    };
-}
-function log() {
-    console.log('log init');
-    return (target) => {
-        console.log('log run');
-        console.log(target);
-    };
-}
-function setUsersAdvanced(users) {
-    return (constructor) => {
-        return class extends constructor {
-            constructor() {
-                super(...arguments);
-                this.users = users;
+__decorate([
+    Max(100)
+], UserService.prototype, "users", void 0);
+function Max(max) {
+    return (target, propertyKey) => {
+        let value;
+        const setter = function (newValue) {
+            if (newValue > max) {
+                console.log(`Нельзя установить значение больше ${max}`);
+            }
+            else {
+                value = newValue;
             }
         };
+        const getter = function () {
+            return value;
+        };
+        Object.defineProperty(target, propertyKey, {
+            set: setter,
+            get: getter
+        });
     };
 }
-function threeUserAdvanced(constructor) {
-    return class extends constructor {
-        constructor() {
-            super(...arguments);
-            this.users = 3;
-        }
-    };
-}
-console.log(new UserService().getUsersInDatabase());
+const userService = new UserService();
+userService.users = 1;
+console.log(userService.users);
+userService.users = 1000;
+console.log(userService.users);

@@ -1546,56 +1546,152 @@
 // console.log(new UserService().getUsersInDatabase());
 
 
-//============== 08_085 Fabric of decorators ========================
+// //============== 08_085 Fabric of decorators ========================
+// interface IUserService {
+// 	users: number;
+// 	getUsersInDatabase(): number;
+// }
+
+// // @setUsersAdvanced(4)
+// // @threeUserAdvanced
+// @log()
+// @setUsers(2)
+// // @nullUsers
+// class UserService implements IUserService {
+// 	users: number = 1000;
+// 	getUsersInDatabase(): number {
+// 		return this.users;
+// 	}	
+// }
+
+// function nullUsers (target: Function) {
+// 	target.prototype.users = 0;
+// }
+
+// function setUsers(users: number) {
+// 	console.log('setUsers init');	
+// 	return (target: Function) => {
+// 		console.log('setUsers run');		
+// 		target.prototype.users = users;
+// 	}
+// }
+
+// function log() {
+// 	console.log('log init');
+// 	return (target: Function) => {
+// 		console.log('log run');
+// 		console.log(target);
+// 	}
+// }
+
+// function setUsersAdvanced(users: number) {
+// 	return <T extends {new(...args: any[]): {} }>(constructor: T) => {
+// 		return class extends constructor {
+// 			users = users;
+// 		}
+// 	}
+// }
+
+// function threeUserAdvanced<T extends {new(...args: any[]): {} }>(constructor: T) {
+// 	return class extends constructor {
+// 		users = 3;
+// 	}
+// }
+
+// console.log(new UserService().getUsersInDatabase());
+
+
+//============== 08_087 Decorators of methods ========================
+// interface IUserService {
+// 	users: number;
+// 	getUsersInDatabase(): number;
+// }
+
+// class UserService implements IUserService {
+// 	users: number = 1000;
+
+// 	@Log()
+// 	getUsersInDatabase(): number {
+// 		throw new Error('Ошибка');
+// 	}	
+// }
+
+// // function Log(
+// // 	target: object,
+// // 	propertyKey: string | symbol,
+// // 	descriptor: TypedPropertyDescriptor<(...args: any[]) => any>
+// // ): TypedPropertyDescriptor<(...args: any[]) => any> | void {
+// // 	console.log(target);
+// // 	console.log(propertyKey);
+// // 	console.log(descriptor);
+// // 	descriptor.value = () => {
+// // 		console.log('no error');
+		
+// // 	}
+// // }
+
+// //Factory
+// function Log() {
+// 	return (target: object,
+// 		propertyKey: string | symbol,
+// 		descriptor: TypedPropertyDescriptor<(...args: any[]) => any>
+// 	): TypedPropertyDescriptor<(...args: any[]) => any> | void => {
+// 		console.log(target);
+// 		console.log(propertyKey);
+// 		console.log(descriptor);
+// 		// const oldValue = descriptor.value;
+// 		descriptor.value = () => {
+// 			console.log('no error');
+// 			// oldValue()
+			
+// 		}
+// 	}
+// }
+
+// console.log(new UserService().getUsersInDatabase());
+
+
+//============== 08_089 Decorators of properties ========================
 interface IUserService {
 	users: number;
 	getUsersInDatabase(): number;
 }
 
-// @setUsersAdvanced(4)
-// @threeUserAdvanced
-@log()
-@setUsers(2)
-// @nullUsers
 class UserService implements IUserService {
-	users: number = 1000;
+	@Max(100)
+	users: number;
+
 	getUsersInDatabase(): number {
-		return this.users;
+		throw new Error('Ошибка');
 	}	
 }
 
-function nullUsers (target: Function) {
-	target.prototype.users = 0;
-}
-
-function setUsers(users: number) {
-	console.log('setUsers init');	
-	return (target: Function) => {
-		console.log('setUsers run');		
-		target.prototype.users = users;
-	}
-}
-
-function log() {
-	console.log('log init');
-	return (target: Function) => {
-		console.log('log run');
-		console.log(target);
-	}
-}
-
-function setUsersAdvanced(users: number) {
-	return <T extends {new(...args: any[]): {} }>(constructor: T) => {
-		return class extends constructor {
-			users = users;
+function Max(max: number) {
+	return (
+		target: Object,
+		propertyKey: string | symbol		
+	) => {
+		let value: number;
+		const setter = function (newValue: number) {
+			if (newValue > max) {
+				console.log(`Нельзя установить значение больше ${max}`);				
+			} else {
+				value = newValue;
+			}
 		}
+		const getter = function () {
+			return value;
+		}
+
+		Object.defineProperty(target, propertyKey, {
+			set: setter,
+			get: getter
+		})
 	}
 }
 
-function threeUserAdvanced<T extends {new(...args: any[]): {} }>(constructor: T) {
-	return class extends constructor {
-		users = 3;
-	}
-}
-
-console.log(new UserService().getUsersInDatabase());
+const userService = new UserService();
+userService.users = 1;
+console.log(userService.users);
+userService.users = 1000;
+console.log(userService.users);
