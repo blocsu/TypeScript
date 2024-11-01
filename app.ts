@@ -1697,7 +1697,48 @@
 // console.log(userService.users);
 
 
-//============== 10_090 Decorator accessor ========================
+// //============== 10_090 Decorator accessor ========================
+// interface IUserService {
+// 	getUsersInDatabase(): number;
+// }
+
+// class UserService implements IUserService {
+// 	private _users: number;
+
+// 	@Log()
+// 	set users(num: number) {
+// 		this._users = num;
+// 	}
+	
+// 	get users() {
+// 		return this._users
+// 	}
+
+// 	getUsersInDatabase(): number {
+// 		throw new Error('Ошибка');
+// 	}	
+// }
+
+// function Log() {
+// 	return (
+// 		target: Object,
+// 		_: string | symbol,
+// 		descriptor: PropertyDescriptor		
+// 	) => {
+// 		const set = descriptor.set;
+// 		descriptor.set = (...args: any) => {
+// 			console.log(args);
+// 			set?.apply(target, args);
+// 		}
+// 	}
+// }
+
+// const userService = new UserService();
+// userService.users = 1;
+// console.log(userService.users);
+
+
+//============== 10_091 Decorator of parameter ========================
 interface IUserService {
 	getUsersInDatabase(): number;
 }
@@ -1705,34 +1746,27 @@ interface IUserService {
 class UserService implements IUserService {
 	private _users: number;
 
-	@Log()
-	set users(num: number) {
-		this._users = num;
-	}
-	
-	get users() {
-		return this._users
-	}
-
 	getUsersInDatabase(): number {
-		throw new Error('Ошибка');
+		return this._users;
+	}	
+
+	setUsersInDatabase(@Positsve() num: number, @Positsve() _?: number): void {
+		this._users = num;
 	}	
 }
 
-function Log() {
+function Positsve() {
 	return (
 		target: Object,
-		_: string | symbol,
-		descriptor: PropertyDescriptor		
+		propertyKey: string | symbol,
+		parameterIndex: number		
 	) => {
-		const set = descriptor.set;
-		descriptor.set = (...args: any) => {
-			console.log(args);
-			set?.apply(target, args);
-		}
+		console.log(target);
+		console.log(propertyKey);
+		console.log(parameterIndex);		
 	}
 }
 
 const userService = new UserService();
-userService.users = 1;
-console.log(userService.users);
+userService.setUsersInDatabase(5);
+console.log(userService.getUsersInDatabase());
