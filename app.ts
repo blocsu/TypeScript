@@ -1413,7 +1413,7 @@
 // }
 
 
-// //============== 08_076 Template Literal Types ========================
+// //============== 09_078 Partial, Required, Readonly ========================
 // interface User {
 // 	neme: string;
 // 	age?: number;
@@ -1428,7 +1428,7 @@
 // type requiredAndReadonly = Required<Readonly<User>>;
 
 
-// //============== 08_079 Pick, Omit, Extract, Exclude ========================
+// //============== 09_079 Pick, Omit, Extract, Exclude ========================
 // interface PaymentPersistent {
 // 	id: number;
 // 	sum: number;
@@ -1463,7 +1463,7 @@
 // type IT = InstanceType<typeof User>;
 
 
-// //============== 08_081 Awaited ========================
+// //============== 09_081 Awaited ========================
 // type A = Awaited<Promise<string>>;//string
 // type A2 = Awaited<Promise<Promise<string>>>;//string
 
@@ -1489,7 +1489,7 @@
 // }
 
 
-// //============== 08_083 Decorator's pattern ========================
+// //============== 10_083 Decorator's pattern ========================
 // interface IUserService {
 // 	users: number;
 // 	getUsersInDatabase(): number;
@@ -1518,7 +1518,7 @@
 // console.log(nullUsers(logUsers(new UserService())).getUsersInDatabase());
 
 
-// //============== 08_084 Decorator of class ========================
+// //============== 10_084 Decorator of class ========================
 // interface IUserService {
 // 	users: number;
 // 	getUsersInDatabase(): number;
@@ -1546,7 +1546,7 @@
 // console.log(new UserService().getUsersInDatabase());
 
 
-// //============== 08_085 Fabric of decorators ========================
+// //============== 10_085 Fabric of decorators ========================
 // interface IUserService {
 // 	users: number;
 // 	getUsersInDatabase(): number;
@@ -1601,7 +1601,7 @@
 // console.log(new UserService().getUsersInDatabase());
 
 
-//============== 08_087 Decorators of methods ========================
+//============== 10_087 Decorators of methods ========================
 // interface IUserService {
 // 	users: number;
 // 	getUsersInDatabase(): number;
@@ -1651,47 +1651,88 @@
 // console.log(new UserService().getUsersInDatabase());
 
 
-//============== 08_089 Decorators of properties ========================
+// //============== 10_089 Decorators of properties ========================
+// interface IUserService {
+// 	users: number;
+// 	getUsersInDatabase(): number;
+// }
+
+// class UserService implements IUserService {
+// 	@Max(100)
+// 	users: number;
+
+// 	getUsersInDatabase(): number {
+// 		throw new Error('Ошибка');
+// 	}	
+// }
+
+// function Max(max: number) {
+// 	return (
+// 		target: Object,
+// 		propertyKey: string | symbol		
+// 	) => {
+// 		let value: number;
+// 		const setter = function (newValue: number) {
+// 			if (newValue > max) {
+// 				console.log(`Нельзя установить значение больше ${max}`);				
+// 			} else {
+// 				value = newValue;
+// 			}
+// 		}
+// 		const getter = function () {
+// 			return value;
+// 		}
+
+// 		Object.defineProperty(target, propertyKey, {
+// 			set: setter,
+// 			get: getter
+// 		})
+// 	}
+// }
+
+// const userService = new UserService();
+// userService.users = 1;
+// console.log(userService.users);
+// userService.users = 1000;
+// console.log(userService.users);
+
+
+//============== 10_090 Decorator accessor ========================
 interface IUserService {
-	users: number;
 	getUsersInDatabase(): number;
 }
 
 class UserService implements IUserService {
-	@Max(100)
-	users: number;
+	private _users: number;
+
+	@Log()
+	set users(num: number) {
+		this._users = num;
+	}
+	
+	get users() {
+		return this._users
+	}
 
 	getUsersInDatabase(): number {
 		throw new Error('Ошибка');
 	}	
 }
 
-function Max(max: number) {
+function Log() {
 	return (
 		target: Object,
-		propertyKey: string | symbol		
+		_: string | symbol,
+		descriptor: PropertyDescriptor		
 	) => {
-		let value: number;
-		const setter = function (newValue: number) {
-			if (newValue > max) {
-				console.log(`Нельзя установить значение больше ${max}`);				
-			} else {
-				value = newValue;
-			}
+		const set = descriptor.set;
+		descriptor.set = (...args: any) => {
+			console.log(args);
+			set?.apply(target, args);
 		}
-		const getter = function () {
-			return value;
-		}
-
-		Object.defineProperty(target, propertyKey, {
-			set: setter,
-			get: getter
-		})
 	}
 }
 
 const userService = new UserService();
 userService.users = 1;
-console.log(userService.users);
-userService.users = 1000;
 console.log(userService.users);
