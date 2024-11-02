@@ -1,0 +1,25 @@
+{
+  "name": "typescript",
+  "version": "1.0.0",
+  "description": "TypeScript - это язык программирования, являющийся надмножеством JavaScript, компилирующимся в него. Благодаря системе типов и дополнительным возможностям, он позволяет писать большие масштабируемые приложения, которые просто поддерживать и развивать. Вместо отлова ошибок в runtime вы получаете быструю проверку вашего кода в compiletime и тесную интеграцию с IDE для быстрого написания кода. При этом вы можете переводить ваши приложения на TypeScript постепенно, улучшая типизацию и качество кода. Сейчас уже сложно встретить большое приложение для frontend или backend без использования TypeScript. Язык уже является стандартом разработки и может быть использован с любым framework.",
+  "main": "app.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blocsu/TypeScript.git"
+  },
+  "author": "Pengineer",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/blocsu/TypeScript/issues"
+  },
+  "homepage": "https://github.com/blocsu/TypeScript#readme",
+  "dependencies": {
+    "reflect-metadata": "^0.2.2"
+  }
+}
