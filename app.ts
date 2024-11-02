@@ -1772,64 +1772,94 @@
 // console.log(userService.getUsersInDatabase());
 
 
-//============== 10_092 Metadata ========================
-import 'reflect-metadata';
+// //============== 10_092 Metadata ========================
+// import 'reflect-metadata';
 
-const POSITIVE_METADATA_KEY = Symbol('POSITIVE_METADATA_KEY');
+// const POSITIVE_METADATA_KEY = Symbol('POSITIVE_METADATA_KEY');
 
-interface IUserService {
-	getUsersInDatabase(): number;
-}
+// interface IUserService {
+// 	getUsersInDatabase(): number;
+// }
 
-class UserService implements IUserService {
-	private _users: number;
+// class UserService implements IUserService {
+// 	private _users: number;
 
-	getUsersInDatabase(): number {
-		return this._users;
-	}	
+// 	getUsersInDatabase(): number {
+// 		return this._users;
+// 	}	
 
-	@Validate()
-	setUsersInDatabase(@Positsve() num: number): void {
-		this._users = num;
-	}	
-}
+// 	@Validate()
+// 	setUsersInDatabase(@Positsve() num: number): void {
+// 		this._users = num;
+// 	}	
+// }
 
-function Positsve() {
-	return (
-		target: Object,
-		propertyKey: string | symbol,
-		parameterIndex: number		
-	) => {
-		console.log(Reflect.getOwnMetadata('design:type', target, propertyKey));
-		console.log(Reflect.getOwnMetadata('design:paramtypes', target, propertyKey));	
-		console.log(Reflect.getOwnMetadata('design:returntype', target, propertyKey));
-		let existParams: number[] = Reflect.getOwnMetadata(POSITIVE_METADATA_KEY, target, propertyKey) || [];
-		existParams.push(parameterIndex);
-		Reflect.defineMetadata(POSITIVE_METADATA_KEY, existParams, target, propertyKey);	
+// function Positsve() {
+// 	return (
+// 		target: Object,
+// 		propertyKey: string | symbol,
+// 		parameterIndex: number		
+// 	) => {
+// 		console.log(Reflect.getOwnMetadata('design:type', target, propertyKey));
+// 		console.log(Reflect.getOwnMetadata('design:paramtypes', target, propertyKey));	
+// 		console.log(Reflect.getOwnMetadata('design:returntype', target, propertyKey));
+// 		let existParams: number[] = Reflect.getOwnMetadata(POSITIVE_METADATA_KEY, target, propertyKey) || [];
+// 		existParams.push(parameterIndex);
+// 		Reflect.defineMetadata(POSITIVE_METADATA_KEY, existParams, target, propertyKey);	
+// 	}
+// }
+
+// function Validate() {
+// 	return (
+// 		target: Object,
+// 		propertyKey: string | symbol,
+// 		descriptor: TypedPropertyDescriptor<(...args: any[]) => any>		
+// 	) => {
+// 		let method = descriptor.value;
+// 		descriptor.value = function (...args: any) {
+// 			let positiveParams: number[] = Reflect.getOwnMetadata(POSITIVE_METADATA_KEY, target, propertyKey);
+// 			if (positiveParams) {
+// 				for (let index of positiveParams) {
+// 					if (args[index] < 0) {
+// 						throw new Error('Число должно быть больше нуля')
+// 					}
+// 				}
+// 			}
+// 			return method?.apply(this, args);
+// 		}
+// 	}
+// }
+
+// const userService = new UserService();
+// console.log(userService.setUsersInDatabase(10));
+// console.log(userService.setUsersInDatabase(-1));
+
+
+//============== 10_093 Order of decorators ========================
+function Uni(name: string): any {
+	console.log(`Инициализация: ${name}`);
+	return function () {
+		console.log(`Вызов: ${name}`);		
 	}
 }
 
-function Validate() {
-	return (
-		target: Object,
-		propertyKey: string | symbol,
-		descriptor: TypedPropertyDescriptor<(...args: any[]) => any>		
-	) => {
-		let method = descriptor.value;
-		descriptor.value = function (...args: any) {
-			let positiveParams: number[] = Reflect.getOwnMetadata(POSITIVE_METADATA_KEY, target, propertyKey);
-			if (positiveParams) {
-				for (let index of positiveParams) {
-					if (args[index] < 0) {
-						throw new Error('Число должно быть больше нуля')
-					}
-				}
-			}
-			return method?.apply(this, args);
-		}
-	}
-}
+@Uni('Класс1')
+@Uni('Класс2')
+class MyClass {
+	@Uni('Метод')
+	method(@Uni('Параметры метода') _: any) {}
 
-const userService = new UserService();
-console.log(userService.setUsersInDatabase(10));
-console.log(userService.setUsersInDatabase(-1));
+	constructor(@Uni('Параметры конструктора') _: any) {}
+
+	@Uni('Свойство 3')
+	props3?: any;
+
+	@Uni('Свойство 1')
+	props?: any;
+
+	@Uni('Свойство static')
+	static props2?: any;
+	
+	@Uni('Метод static')
+	static method2(@Uni('Параметры метода static') _: any) {}
+}
