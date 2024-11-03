@@ -1897,101 +1897,141 @@
 // console.log(json);
 
 
-//============== 12_101 Factory Method ========================
-interface IInsurance {
-	id: number;
-	status: string;
-	setVehicle(vehicle: any): void;
-	submit(): Promise<boolean>;
-}
+// //============== 12_101 Factory Method ========================
+// interface IInsurance {
+// 	id: number;
+// 	status: string;
+// 	setVehicle(vehicle: any): void;
+// 	submit(): Promise<boolean>;
+// }
 
-class TFInsurance implements IInsurance {
-	id: number;
-	status: string;
-	private vehicle: any;
+// class TFInsurance implements IInsurance {
+// 	id: number;
+// 	status: string;
+// 	private vehicle: any;
 
-	setVehicle(vehicle: any): void {
-		this.vehicle = vehicle;
+// 	setVehicle(vehicle: any): void {
+// 		this.vehicle = vehicle;
+// 	}
+
+// 	async submit(): Promise<boolean> {
+// 		const res = await fetch('tf', 
+// 			{
+// 				method: 'POST',
+// 				body: JSON.stringify({vehicle: this.vehicle})
+// 			});
+// 		const data = await res.json();
+// 		return data.isSuccess;
+// 	}
+// }
+
+// class ABInsurance implements IInsurance {
+// 	id: number;
+// 	status: string;
+// 	private vehicle: any;
+
+// 	setVehicle(vehicle: any): void {
+// 		this.vehicle = vehicle;
+// 	}
+
+// 	async submit(): Promise<boolean> {
+// 		const res = await fetch('ab', 
+// 			{
+// 				method: 'POST',
+// 				body: JSON.stringify({vehicle: this.vehicle})
+// 			});
+// 		const data = await res.json();
+// 		return data.yes;
+// 	}
+// }
+
+// //-------------Factory pattern полный ваниант-----------------
+// abstract class InsuraceFactory {
+// 	bd: any;
+
+// 	abstract createInsurance(): IInsurance;
+
+// 	saveHistory(ins: IInsurance) {
+// 		this.bd.save(ins.id, ins.status);
+// 	}
+// }
+
+// class TFInsuranceFactory extends InsuraceFactory {
+// 	createInsurance(): TFInsurance {
+// 		return new TFInsurance();
+// 	}	
+// }
+
+// class ABInsuranceFactory extends InsuraceFactory {
+// 	createInsurance(): ABInsurance {
+// 		return new ABInsurance();
+// 	}	
+// }
+
+// const tfInsuranceFactory = new TFInsuranceFactory();
+// const ins = tfInsuranceFactory.createInsurance();
+// tfInsuranceFactory.saveHistory(ins);
+
+// //-------------Factory pattern компактный ваниант, но без возможности расширения-----------------------
+// const INSURANCE_TYPE = {
+// 	tf: TFInsurance,
+// 	ab: ABInsurance
+// }
+
+// type IT = typeof INSURANCE_TYPE;
+
+// class InsuranceFactoryAlt {
+// 	bd: any;
+
+// 	createInsurance<T extends keyof IT>(type: T): IT[T] {
+// 		return INSURANCE_TYPE[type];
+// 	}
+
+// 	saveHistory(ins: IInsurance) {
+// 		this.bd.save(ins.id, ins.status);
+// 	}
+// }
+
+// const insuranceFactoryAlt = new InsuranceFactoryAlt();
+// const ins2 = new (insuranceFactoryAlt.createInsurance('tf'));
+// insuranceFactoryAlt.saveHistory(ins2);
+
+
+//============== 12_102 Singleton ========================
+class MyMap {
+	private static instance: MyMap;
+
+	map: Map<number, string> = new Map();
+
+	private constructor() {}
+
+	clean() {
+		this.map = new Map();
 	}
 
-	async submit(): Promise<boolean> {
-		const res = await fetch('tf', 
-			{
-				method: 'POST',
-				body: JSON.stringify({vehicle: this.vehicle})
-			});
-		const data = await res.json();
-		return data.isSuccess;
+	public static get(): MyMap {
+		if (!MyMap.instance) {
+			MyMap.instance = new MyMap();
+		}
+		return MyMap.instance;
 	}
 }
 
-class ABInsurance implements IInsurance {
-	id: number;
-	status: string;
-	private vehicle: any;
-
-	setVehicle(vehicle: any): void {
-		this.vehicle = vehicle;
-	}
-
-	async submit(): Promise<boolean> {
-		const res = await fetch('ab', 
-			{
-				method: 'POST',
-				body: JSON.stringify({vehicle: this.vehicle})
-			});
-		const data = await res.json();
-		return data.yes;
+class Service1 {
+	addMap(key: number, value: string) {
+		const myMap = MyMap.get();
+		myMap.map.set(key, value);
 	}
 }
 
-//-------------Factory pattern полный ваниант-----------------
-abstract class InsuraceFactory {
-	bd: any;
-
-	abstract createInsurance(): IInsurance;
-
-	saveHistory(ins: IInsurance) {
-		this.bd.save(ins.id, ins.status);
+class Service2 {
+	getKeys(key: number) {
+		const myMap = MyMap.get();
+		console.log(myMap.map.get(key));
+		myMap.clean();
+		console.log(myMap.map.get(key));
 	}
 }
 
-class TFInsuranceFactory extends InsuraceFactory {
-	createInsurance(): TFInsurance {
-		return new TFInsurance();
-	}	
-}
-
-class ABInsuranceFactory extends InsuraceFactory {
-	createInsurance(): ABInsurance {
-		return new ABInsurance();
-	}	
-}
-
-const tfInsuranceFactory = new TFInsuranceFactory();
-const ins = tfInsuranceFactory.createInsurance();
-tfInsuranceFactory.saveHistory(ins);
-
-//-------------Factory pattern компактный ваниант, но без возможности расширения-----------------------
-const INSURANCE_TYPE = {
-	tf: TFInsurance,
-	ab: ABInsurance
-}
-
-type IT = typeof INSURANCE_TYPE;
-
-class InsuranceFactoryAlt {
-	bd: any;
-
-	createInsurance<T extends keyof IT>(type: T): IT[T] {
-		return INSURANCE_TYPE[type];
-	}
-
-	saveHistory(ins: IInsurance) {
-		this.bd.save(ins.id, ins.status);
-	}
-}
-
-const insuranceFactoryAlt = new InsuranceFactoryAlt();
-const ins2 = new (insuranceFactoryAlt.createInsurance('tf'));
-insuranceFactoryAlt.saveHistory(ins2);
+new Service1().addMap(1, 'Working');
+new Service2().getKeys(1);
