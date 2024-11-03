@@ -1865,17 +1865,17 @@
 // }
 
 
-// //============== 10_095 Namespaces and reference ========================
+// //============== 11_095 Namespaces and reference ========================
 // /// <reference path="./module/app2.ts"/>
 // console.log(A.a);
 
 
-// //============== 10_096_097 Modules on backend / frontend ========================
+// //============== 11_096_097 Modules on backend / frontend ========================
 // import { A } from './module/app2.js';
 // console.log(A.a);
 
 
-// //============== 10_098 098 Import and export ========================
+// //============== 11_098 098 Import and export ========================
 // import type { MyType2 } from './module/app2';
 // import * as all from './module/app2';
 // import runing, { a, Test as CI, type MyType } from './module/app2';
@@ -1889,10 +1889,109 @@
 // const c: MyType2 = 7;
 
 
-//============== 10_099 Typing of External libraries ========================
-// //@ts-ignore
-import { toJson } from 'really-relaxed-json';
-const rjson = '[ one two three {foo:bar} ]'
-const json = toJson(rjson)
-console.log(json);
+// //============== 11_099 Typing of External libraries ========================
+// // //@ts-ignore
+// import { toJson } from 'really-relaxed-json';
+// const rjson = '[ one two three {foo:bar} ]'
+// const json = toJson(rjson)
+// console.log(json);
 
+
+//============== 12_101 Factory Method ========================
+interface IInsurance {
+	id: number;
+	status: string;
+	setVehicle(vehicle: any): void;
+	submit(): Promise<boolean>;
+}
+
+class TFInsurance implements IInsurance {
+	id: number;
+	status: string;
+	private vehicle: any;
+
+	setVehicle(vehicle: any): void {
+		this.vehicle = vehicle;
+	}
+
+	async submit(): Promise<boolean> {
+		const res = await fetch('tf', 
+			{
+				method: 'POST',
+				body: JSON.stringify({vehicle: this.vehicle})
+			});
+		const data = await res.json();
+		return data.isSuccess;
+	}
+}
+
+class ABInsurance implements IInsurance {
+	id: number;
+	status: string;
+	private vehicle: any;
+
+	setVehicle(vehicle: any): void {
+		this.vehicle = vehicle;
+	}
+
+	async submit(): Promise<boolean> {
+		const res = await fetch('ab', 
+			{
+				method: 'POST',
+				body: JSON.stringify({vehicle: this.vehicle})
+			});
+		const data = await res.json();
+		return data.yes;
+	}
+}
+
+//-------------Factory pattern полный ваниант-----------------
+abstract class InsuraceFactory {
+	bd: any;
+
+	abstract createInsurance(): IInsurance;
+
+	saveHistory(ins: IInsurance) {
+		this.bd.save(ins.id, ins.status);
+	}
+}
+
+class TFInsuranceFactory extends InsuraceFactory {
+	createInsurance(): TFInsurance {
+		return new TFInsurance();
+	}	
+}
+
+class ABInsuranceFactory extends InsuraceFactory {
+	createInsurance(): ABInsurance {
+		return new ABInsurance();
+	}	
+}
+
+const tfInsuranceFactory = new TFInsuranceFactory();
+const ins = tfInsuranceFactory.createInsurance();
+tfInsuranceFactory.saveHistory(ins);
+
+//-------------Factory pattern компактный ваниант, но без возможности расширения-----------------------
+const INSURANCE_TYPE = {
+	tf: TFInsurance,
+	ab: ABInsurance
+}
+
+type IT = typeof INSURANCE_TYPE;
+
+class InsuranceFactoryAlt {
+	bd: any;
+
+	createInsurance<T extends keyof IT>(type: T): IT[T] {
+		return INSURANCE_TYPE[type];
+	}
+
+	saveHistory(ins: IInsurance) {
+		this.bd.save(ins.id, ins.status);
+	}
+}
+
+const insuranceFactoryAlt = new InsuranceFactoryAlt();
+const ins2 = new (insuranceFactoryAlt.createInsurance('tf'));
+insuranceFactoryAlt.saveHistory(ins2);
