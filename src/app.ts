@@ -2037,36 +2037,101 @@
 // new Service2().getKeys(1);
 
 
-//============== 12_103 Prototype ========================
-interface Prototype<T> {
-	clone(): T;
+// //============== 12_103 Prototype ========================
+// interface Prototype<T> {
+// 	clone(): T;
+// }
+
+// class UserHistory implements Prototype<UserHistory> {
+// 	createdAt: Date;
+
+// 	constructor(public email: string, public name: string) {
+// 		this.createdAt = new Date;
+// 	}
+
+// 	clone(): UserHistory {
+// 		let target = new UserHistory(this.email, this.name);
+// 		target.createdAt = this.createdAt
+// 		return target;
+// 	}
+// }
+
+// const user = new UserHistory('a@a.ru', 'Anton');
+// const user2 = user;
+// const cloneUser = user.clone();
+// console.log(`user:`, user);
+// user2.email = 'user2@v.ru';
+// user2.name = 'User2';
+// //Изменение user2 изменило также user, а cloneUser отдельная копия которая не влияет на исодый экзеппляр
+// console.log(`user:`, user);
+// console.log(`user2:`, user2);
+// console.log(`cloneUser:`, cloneUser);
+// cloneUser.email = 'cloneUser@v.ru';
+// cloneUser.name = 'CloneUser';
+// console.log(`user:`, user);
+// console.log(`cloneUser:`, cloneUser);
+
+
+//============== 12_104 Prototype ========================
+enum ImageFormat {
+	Png = 'png',
+	Jpg = 'jpg'
 }
 
-class UserHistory implements Prototype<UserHistory> {
-	createdAt: Date;
+interface IResolution { 
+	width: number;
+	height: number;
+}
 
-	constructor(public email: string, public name: string) {
-		this.createdAt = new Date;
+interface IImageConversion extends IResolution { 
+	format: ImageFormat;
+}
+
+class ImageBuilder {
+	private formats: ImageFormat[] = [];
+	private resolutions: IResolution[] = [];
+
+	addPng() {
+		if (this.formats.includes(ImageFormat.Png)) {
+			return this;
+		}
+		this.formats.push(ImageFormat.Png);
+		return this;
 	}
 
-	clone(): UserHistory {
-		let target = new UserHistory(this.email, this.name);
-		target.createdAt = this.createdAt
-		return target;
+	addJpg() {
+		if (this.formats.includes(ImageFormat.Jpg)) {
+			return this;
+		}
+		this.formats.push(ImageFormat.Jpg);
+		return this;
+	}
+
+	addResolution(width: number, height: number) {
+		this.resolutions.push({width, height});
+		return this;
+	}
+
+	build(): IImageConversion[] {
+		const res: IImageConversion[] = [];
+		for(const r of this.resolutions) {
+			for(const f of this.formats) {
+				res.push({
+					format: f,
+					width: r.width,
+					height: r.height
+				});
+			}
+		}
+		return res;
 	}
 }
 
-const user = new UserHistory('a@a.ru', 'Anton');
-const user2 = user;
-const cloneUser = user.clone();
-console.log(`user:`, user);
-user2.email = 'user2@v.ru';
-user2.name = 'User2';
-//Изменение user2 изменило также user, а cloneUser отдельная копия которая не влияет на исодый экзеппляр
-console.log(`user:`, user);
-console.log(`user2:`, user2);
-console.log(`cloneUser:`, cloneUser);
-cloneUser.email = 'cloneUser@v.ru';
-cloneUser.name = 'CloneUser';
-console.log(`user:`, user);
-console.log(`cloneUser:`, cloneUser);
+console.log(new ImageBuilder()
+	.addJpg()
+	.addPng()
+	.addResolution(50, 100)
+	.addResolution(100, 200)
+	.build()
+);
+
