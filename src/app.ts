@@ -1997,41 +1997,76 @@
 // insuranceFactoryAlt.saveHistory(ins2);
 
 
-//============== 12_102 Singleton ========================
-class MyMap {
-	private static instance: MyMap;
+// //============== 12_102 Singleton ========================
+// class MyMap {
+// 	private static instance: MyMap;
 
-	map: Map<number, string> = new Map();
+// 	map: Map<number, string> = new Map();
 
-	private constructor() {}
+// 	private constructor() {}
 
-	clean() {
-		this.map = new Map();
+// 	clean() {
+// 		this.map = new Map();
+// 	}
+
+// 	public static get(): MyMap {
+// 		if (!MyMap.instance) {
+// 			MyMap.instance = new MyMap();
+// 		}
+// 		return MyMap.instance;
+// 	}
+// }
+
+// class Service1 {
+// 	addMap(key: number, value: string) {
+// 		const myMap = MyMap.get();
+// 		myMap.map.set(key, value);
+// 	}
+// }
+
+// class Service2 {
+// 	getKeys(key: number) {
+// 		const myMap = MyMap.get();
+// 		console.log(myMap.map.get(key));
+// 		myMap.clean();
+// 		console.log(myMap.map.get(key));
+// 	}
+// }
+
+// new Service1().addMap(1, 'Working');
+// new Service2().getKeys(1);
+
+
+//============== 12_103 Prototype ========================
+interface Prototype<T> {
+	clone(): T;
+}
+
+class UserHistory implements Prototype<UserHistory> {
+	createdAt: Date;
+
+	constructor(public email: string, public name: string) {
+		this.createdAt = new Date;
 	}
 
-	public static get(): MyMap {
-		if (!MyMap.instance) {
-			MyMap.instance = new MyMap();
-		}
-		return MyMap.instance;
+	clone(): UserHistory {
+		let target = new UserHistory(this.email, this.name);
+		target.createdAt = this.createdAt
+		return target;
 	}
 }
 
-class Service1 {
-	addMap(key: number, value: string) {
-		const myMap = MyMap.get();
-		myMap.map.set(key, value);
-	}
-}
-
-class Service2 {
-	getKeys(key: number) {
-		const myMap = MyMap.get();
-		console.log(myMap.map.get(key));
-		myMap.clean();
-		console.log(myMap.map.get(key));
-	}
-}
-
-new Service1().addMap(1, 'Working');
-new Service2().getKeys(1);
+const user = new UserHistory('a@a.ru', 'Anton');
+const user2 = user;
+const cloneUser = user.clone();
+console.log(`user:`, user);
+user2.email = 'user2@v.ru';
+user2.name = 'User2';
+//Изменение user2 изменило также user, а cloneUser отдельная копия которая не влияет на исодый экзеппляр
+console.log(`user:`, user);
+console.log(`user2:`, user2);
+console.log(`cloneUser:`, cloneUser);
+cloneUser.email = 'cloneUser@v.ru';
+cloneUser.name = 'CloneUser';
+console.log(`user:`, user);
+console.log(`cloneUser:`, cloneUser);
