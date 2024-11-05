@@ -2072,66 +2072,120 @@
 // console.log(`cloneUser:`, cloneUser);
 
 
-//============== 12_104 Prototype ========================
-enum ImageFormat {
-	Png = 'png',
-	Jpg = 'jpg'
+// //============== 12_104 Prototype ========================
+// enum ImageFormat {
+// 	Png = 'png',
+// 	Jpg = 'jpg'
+// }
+
+// interface IResolution { 
+// 	width: number;
+// 	height: number;
+// }
+
+// interface IImageConversion extends IResolution { 
+// 	format: ImageFormat;
+// }
+
+// class ImageBuilder {
+// 	private formats: ImageFormat[] = [];
+// 	private resolutions: IResolution[] = [];
+
+// 	addPng() {
+// 		if (this.formats.includes(ImageFormat.Png)) {
+// 			return this;
+// 		}
+// 		this.formats.push(ImageFormat.Png);
+// 		return this;
+// 	}
+
+// 	addJpg() {
+// 		if (this.formats.includes(ImageFormat.Jpg)) {
+// 			return this;
+// 		}
+// 		this.formats.push(ImageFormat.Jpg);
+// 		return this;
+// 	}
+
+// 	addResolution(width: number, height: number) {
+// 		this.resolutions.push({width, height});
+// 		return this;
+// 	}
+
+// 	build(): IImageConversion[] {
+// 		const res: IImageConversion[] = [];
+// 		for(const r of this.resolutions) {
+// 			for(const f of this.formats) {
+// 				res.push({
+// 					format: f,
+// 					width: r.width,
+// 					height: r.height
+// 				});
+// 			}
+// 		}
+// 		return res;
+// 	}
+// }
+
+// console.log(new ImageBuilder()
+// 	.addJpg()
+// 	.addPng()
+// 	.addResolution(50, 100)
+// 	.addResolution(100, 200)
+// 	.build()
+// );
+
+
+//============== 13_106 Bridge ========================
+interface IProvider {
+	sendMessage(message: string):void;
+	connect(config: unknown): void;
+	disconnect(): void;
 }
 
-interface IResolution { 
-	width: number;
-	height: number;
-}
-
-interface IImageConversion extends IResolution { 
-	format: ImageFormat;
-}
-
-class ImageBuilder {
-	private formats: ImageFormat[] = [];
-	private resolutions: IResolution[] = [];
-
-	addPng() {
-		if (this.formats.includes(ImageFormat.Png)) {
-			return this;
-		}
-		this.formats.push(ImageFormat.Png);
-		return this;
+class TelegramProvider implements IProvider {
+	sendMessage(message: string): void {
+		console.log(message);		
 	}
-
-	addJpg() {
-		if (this.formats.includes(ImageFormat.Jpg)) {
-			return this;
-		}
-		this.formats.push(ImageFormat.Jpg);
-		return this;
+	connect(config: string): void {
+		console.log(config);
 	}
-
-	addResolution(width: number, height: number) {
-		this.resolutions.push({width, height});
-		return this;
-	}
-
-	build(): IImageConversion[] {
-		const res: IImageConversion[] = [];
-		for(const r of this.resolutions) {
-			for(const f of this.formats) {
-				res.push({
-					format: f,
-					width: r.width,
-					height: r.height
-				});
-			}
-		}
-		return res;
+	disconnect(): void {
+		console.log('Disconnect TG');		
 	}
 }
 
-console.log(new ImageBuilder()
-	.addJpg()
-	.addPng()
-	.addResolution(50, 100)
-	.addResolution(100, 200)
-	.build()
-);
+class WhatsUpProvider implements IProvider {
+	sendMessage(message: string): void {
+		console.log(message);		
+	}
+	connect(config: string): void {
+		console.log(config);
+	}
+	disconnect(): void {
+		console.log('Disconnect WU');		
+	}
+}
+
+class NotificationSender {
+	constructor(private provider: IProvider) {}
+
+	send() {
+		this.provider.connect('connect');
+		this.provider.sendMessage('message');
+		this.provider.disconnect();
+	}
+}
+
+class DelayNotificationSender extends NotificationSender {
+	constructor(provider: IProvider) {
+		super(provider);
+	}
+	sendDelayd() {}
+}
+
+const sender = new NotificationSender(new TelegramProvider());
+sender.send();
+const sender2 = new NotificationSender(new WhatsUpProvider());
+sender2.send();
 
