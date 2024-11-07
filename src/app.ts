@@ -2239,33 +2239,68 @@
 // s.send('as@as.ru', 'other');
 
 
-//============== 13_108 Adapter ========================
-class KVDatabase {
-	private db: Map<string, string> = new Map();
-	save(key:string, value: string) {
-		this.db.set(key, value);
-	}
-}
+// //============== 13_108 Adapter ========================
+// class KVDatabase {
+// 	private db: Map<string, string> = new Map();
+// 	save(key:string, value: string) {
+// 		this.db.set(key, value);
+// 	}
+// }
 
-class PersistentDB {
-	savePersistent(data: Object) {
-		console.log(data);
+// class PersistentDB {
+// 	savePersistent(data: Object) {
+// 		console.log(data);
 		
+// 	}
+// }
+
+// class PersistentDBAdapter extends KVDatabase {
+// 	constructor(public database: PersistentDB) {
+// 		super();
+
+// 	}
+// 	override save(key: string, value: string): void {
+// 		this.database.savePersistent({key, value})
+// 	}
+// }
+
+// function run(base: KVDatabase) {
+// 	base.save('key', 'myValue');
+// }
+
+// run(new PersistentDBAdapter(new PersistentDB));
+
+
+//============== 13_109 Proxy ========================
+interface IPaymentAPI {
+	getPaymentDetail(id: number): IPaymentDetail | undefined;
+}
+
+interface IPaymentDetail {
+	id: number;
+	sum: number;
+}
+
+class PaymentAPI implements IPaymentAPI {
+	private date = [{id: 1, sum: 10000}, {id: 2, sum: 20000}];
+	getPaymentDetail(id: number): IPaymentDetail | undefined {
+		return this.date.find(d => d.id === id)
 	}
 }
 
-class PersistentDBAdapter extends KVDatabase {
-	constructor(public database: PersistentDB) {
-		super();
-
-	}
-	override save(key: string, value: string): void {
-		this.database.savePersistent({key, value})
+class PaymentAccessProxy implements IPaymentAPI {
+	constructor(private api: PaymentAPI,private userId: number) {}
+	getPaymentDetail(id: number): IPaymentDetail | undefined {
+		if (this.userId === id) {
+			return this.api.getPaymentDetail(id);
+		}
+		console.log('Попытка получить данные платежа!');
+		return undefined;		
 	}
 }
 
-function run(base: KVDatabase) {
-	base.save('key', 'myValue');
-}
-
-run(new PersistentDBAdapter(new PersistentDB));
+const proxy = new PaymentAccessProxy(new PaymentAPI(), 1);
+console.log(proxy.getPaymentDetail(1));
+const proxy2 = new PaymentAccessProxy(new PaymentAPI(), 2);
+console.log(proxy2.getPaymentDetail(2));
+console.log(proxy2.getPaymentDetail(3));
