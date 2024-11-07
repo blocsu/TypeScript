@@ -2136,56 +2136,104 @@
 // );
 
 
-//============== 13_106 Bridge ========================
-interface IProvider {
-	sendMessage(message: string):void;
-	connect(config: unknown): void;
-	disconnect(): void;
+// //============== 13_106 Bridge ========================
+// interface IProvider {
+// 	sendMessage(message: string):void;
+// 	connect(config: unknown): void;
+// 	disconnect(): void;
+// }
+
+// class TelegramProvider implements IProvider {
+// 	sendMessage(message: string): void {
+// 		console.log(message);		
+// 	}
+// 	connect(config: string): void {
+// 		console.log(config);
+// 	}
+// 	disconnect(): void {
+// 		console.log('Disconnect TG');		
+// 	}
+// }
+
+// class WhatsUpProvider implements IProvider {
+// 	sendMessage(message: string): void {
+// 		console.log(message);		
+// 	}
+// 	connect(config: string): void {
+// 		console.log(config);
+// 	}
+// 	disconnect(): void {
+// 		console.log('Disconnect WU');		
+// 	}
+// }
+
+// class NotificationSender {
+// 	constructor(private provider: IProvider) {}
+
+// 	send() {
+// 		this.provider.connect('connect');
+// 		this.provider.sendMessage('message');
+// 		this.provider.disconnect();
+// 	}
+// }
+
+// class DelayNotificationSender extends NotificationSender {
+// 	constructor(provider: IProvider) {
+// 		super(provider);
+// 	}
+// 	sendDelayd() {}
+// }
+
+// const sender = new NotificationSender(new TelegramProvider());
+// sender.send();
+// const sender2 = new NotificationSender(new WhatsUpProvider());
+// sender2.send();
+
+
+//============== 13_107 Facade ========================
+class Notify {
+	send(template: string, to: string) {
+		console.log(`Отправляю ${template}: ${to}`);
+		
+	}
 }
 
-class TelegramProvider implements IProvider {
-	sendMessage(message: string): void {
+class Log {
+	log(message: string) {
 		console.log(message);		
 	}
-	connect(config: string): void {
-		console.log(config);
-	}
-	disconnect(): void {
-		console.log('Disconnect TG');		
+}
+
+class Template {
+	private templates = [
+		{name: 'other', template: '<h1>Шаблон!</h1>'}
+];
+
+	getByName(name: string) {
+		return this.templates.find(t => t.name === name);
 	}
 }
 
-class WhatsUpProvider implements IProvider {
-	sendMessage(message: string): void {
-		console.log(message);		
+class NotificationFacad {
+	private notify: Notify;
+	private logger: Log;
+	private template : Template;
+	constructor() {
+		this.notify = new Notify();
+		this.logger = new Log();
+		this.template = new Template();
 	}
-	connect(config: string): void {
-		console.log(config);
-	}
-	disconnect(): void {
-		console.log('Disconnect WU');		
+
+	send(to: string, templateName: string) {
+		const data = this.template.getByName(templateName);
+		if (!data) {
+			this.logger.log('Не найден шаблон!');
+			return;
+		}
+		this.notify.send(data.template, to);
+		this.logger.log('Шаблон отправлен');
 	}
 }
 
-class NotificationSender {
-	constructor(private provider: IProvider) {}
-
-	send() {
-		this.provider.connect('connect');
-		this.provider.sendMessage('message');
-		this.provider.disconnect();
-	}
-}
-
-class DelayNotificationSender extends NotificationSender {
-	constructor(provider: IProvider) {
-		super(provider);
-	}
-	sendDelayd() {}
-}
-
-const sender = new NotificationSender(new TelegramProvider());
-sender.send();
-const sender2 = new NotificationSender(new WhatsUpProvider());
-sender2.send();
-
+const s = new NotificationFacad();
+s.send('as@as.ru', 'other');
