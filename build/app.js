@@ -1700,42 +1700,70 @@
 // sender.send();
 // const sender2 = new NotificationSender(new WhatsUpProvider());
 // sender2.send();
-//============== 13_107 Facade ========================
-class Notify {
-    send(template, to) {
-        console.log(`Отправляю ${template}: ${to}`);
-    }
-}
-class Log {
-    log(message) {
-        console.log(message);
-    }
-}
-class Template {
+// //============== 13_107 Facade ========================
+// class Notify {
+// 	send(template: string, to: string) {
+// 		console.log(`Отправляю ${template}: ${to}`);
+// 	}
+// }
+// class Log {
+// 	log(message: string) {
+// 		console.log(message);		
+// 	}
+// }
+// class Template {
+// 	private templates = [
+// 		{name: 'other', template: '<h1>Шаблон!</h1>'}
+// ];
+// 	getByName(name: string) {
+// 		return this.templates.find(t => t.name === name);
+// 	}
+// }
+// class NotificationFacad {
+// 	private notify: Notify;
+// 	private logger: Log;
+// 	private template : Template;
+// 	constructor() {
+// 		this.notify = new Notify();
+// 		this.logger = new Log();
+// 		this.template = new Template();
+// 	}
+// 	send(to: string, templateName: string) {
+// 		const data = this.template.getByName(templateName);
+// 		if (!data) {
+// 			this.logger.log('Не найден шаблон!');
+// 			return;
+// 		}
+// 		this.notify.send(data.template, to);
+// 		this.logger.log('Шаблон отправлен');
+// 	}
+// }
+// const s = new NotificationFacad();
+// s.send('as@as.ru', 'other');
+//============== 13_108 Adapter ========================
+class KVDatabase {
     constructor() {
-        this.templates = [
-            { name: 'other', template: '<h1>Шаблон!</h1>' }
-        ];
+        this.db = new Map();
     }
-    getByName(name) {
-        return this.templates.find(t => t.name === name);
+    save(key, value) {
+        this.db.set(key, value);
     }
 }
-class NotificationFacad {
-    constructor() {
-        this.notify = new Notify();
-        this.logger = new Log();
-        this.template = new Template();
-    }
-    send(to, templateName) {
-        const data = this.template.getByName(templateName);
-        if (!data) {
-            this.logger.log('Не найден шаблон!');
-            return;
-        }
-        this.notify.send(data.template, to);
-        this.logger.log('Шаблон отправлен');
+class PersistentDB {
+    savePersistent(data) {
+        console.log(data);
     }
 }
-const s = new NotificationFacad();
-s.send('as@as.ru', 'other');
+class PersistentDBAdapter extends KVDatabase {
+    constructor(database) {
+        super();
+        this.database = database;
+    }
+    save(key, value) {
+        this.database.savePersistent({ key, value });
+    }
+}
+function run(base) {
+    base.save('key', 'myValue');
+}
+run(new PersistentDBAdapter(new PersistentDB));
