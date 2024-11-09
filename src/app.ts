@@ -3,6 +3,7 @@
 // 	return `${firstname} ${secondname}`
 // }
 
+
 // console.log(getFullName('true', 'false'))
 
 //=================03_014 Массивы ==========================
@@ -2306,57 +2307,116 @@
 // console.log(proxy2.getPaymentDetail(1));
 
 
-//============== 13_110 Composite ========================
-abstract class DeliveryItem {
-	items: DeliveryItem[] = [];
+// //============== 13_110 Composite ========================
+// abstract class DeliveryItem {
+// 	items: DeliveryItem[] = [];
 	
-	addItem(item: DeliveryItem) {
-		this.items.push(item);
-	}
+// 	addItem(item: DeliveryItem) {
+// 		this.items.push(item);
+// 	}
 
-	getItemPrices(): number {
-		return this.items.reduce((acc: number, i: DeliveryItem) => acc += i.getPrice(), 0);
-	}
+// 	getItemPrices(): number {
+// 		return this.items.reduce((acc: number, i: DeliveryItem) => acc += i.getPrice(), 0);
+// 	}
 
-	abstract getPrice(): number;
+// 	abstract getPrice(): number;
+// }
+
+// export class DeliveryShop extends DeliveryItem {
+// 	constructor(private deliveryFee: number) {
+// 		super()
+// 	}
+// 	getPrice(): number {
+// 		return this.getItemPrices() + this.deliveryFee;
+// 	}
+// }
+
+// export class Package extends DeliveryItem {
+// 	getPrice(): number {
+// 		return this.getItemPrices();
+// 	}
+
+// }
+
+// export class Product extends DeliveryItem {
+// 	constructor(private price: number) {
+// 		super();
+// 	}
+// 	getPrice(): number {
+// 		return this.price;
+// 	}
+// }
+
+// const shop = new DeliveryShop(100);
+// shop.addItem(new Product(1000));
+
+// const pack1 = new Package();
+// pack1.addItem(new Product(200));
+// pack1.addItem(new Product(300));
+// shop.addItem(pack1);
+
+// const pack2 = new Package();
+// pack2.addItem(new Product(30));
+// shop.addItem(pack2);
+
+// console.log(shop.getPrice());
+
+
+//============== 14_112 Chain of Command ========================
+interface IMiddleware {
+	next(mid: IMiddleware): IMiddleware;
+	handle(request: any): any;
 }
 
-export class DeliveryShop extends DeliveryItem {
-	constructor(private deliveryFee: number) {
-		super()
+abstract class AbstractMiddleware implements IMiddleware {
+	private nextMiddleware: IMiddleware;
+	next(mid: IMiddleware): IMiddleware {
+		this.nextMiddleware = mid;
+		return mid;
 	}
-	getPrice(): number {
-		return this.getItemPrices() + this.deliveryFee;
-	}
-}
-
-export class Package extends DeliveryItem {
-	getPrice(): number {
-		return this.getItemPrices();
-	}
-
-}
-
-export class Product extends DeliveryItem {
-	constructor(private price: number) {
-		super();
-	}
-	getPrice(): number {
-		return this.price;
+	handle(request: any) {
+		if (this.nextMiddleware) {
+			return this.nextMiddleware.handle(request);
+		}
+		return;
 	}
 }
 
-const shop = new DeliveryShop(100);
-shop.addItem(new Product(1000));
+class AuthMiddleware extends AbstractMiddleware {
+	override handle(request: any) {
+		console.log('AuthMiddleware');
+		if (request.userId === 1) {
+			return super.handle(request);
+		}
+		return {error: 'Вы не авторизованы'}
+	}
+}
 
-const pack1 = new Package();
-pack1.addItem(new Product(200));
-pack1.addItem(new Product(300));
-shop.addItem(pack1);
+class ValidateMiddleware extends AbstractMiddleware {
+	override handle(request: any) {
+		console.log('ValidateMiddleWare');
+		if (request.body) {
+			return super.handle(request);
+		}
+		return {error: 'There is not body'}
+	}
+}
 
-const pack2 = new Package();
-pack2.addItem(new Product(30));
-shop.addItem(pack2);
+class Controller extends AbstractMiddleware {
+	override handle(request: any) {
+		console.log('Controller');
+		return {Success: request}
+	}
+}
 
-console.log(shop.getPrice());
+const controller = new Controller();
+const validate = new ValidateMiddleware();
+const auth = new AuthMiddleware();
+
+auth.next(validate).next(controller);
+
+console.log(auth.handle({
+	userId: 1,
+	body:  'I am Ok!' 
+}));
 
