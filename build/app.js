@@ -3,47 +3,44 @@
 // function getFullName(firstname: string, secondname: string): string {
 // 	return `${firstname} ${secondname}`
 // }
-class AbstractMiddleware {
-    next(mid) {
-        this.nextMiddleware = mid;
-        return mid;
+class Madiated {
+    setMediator(mediator) {
+        this.mediator = mediator;
     }
-    handle(request) {
-        if (this.nextMiddleware) {
-            return this.nextMiddleware.handle(request);
+}
+class Notifications {
+    send() {
+        console.log('Отправляю уведомление');
+    }
+}
+class Log {
+    log(message) {
+        console.log(message);
+    }
+}
+class EventHandler extends Madiated {
+    myEvent() {
+        this.mediator.notify('EventHandler', 'myEvent');
+    }
+}
+class NotificationMediator {
+    constructor(notification, logger, handler) {
+        this.notification = notification;
+        this.logger = logger;
+        this.handler = handler;
+    }
+    notify(_, event) {
+        switch (event) {
+            case 'myEvent':
+                this.notification.send();
+                this.logger.log('Отправлено');
+                break;
         }
-        return;
     }
 }
-class AuthMiddleware extends AbstractMiddleware {
-    handle(request) {
-        console.log('AuthMiddleware');
-        if (request.userId === 1) {
-            return super.handle(request);
-        }
-        return { error: 'Вы не авторизованы' };
-    }
-}
-class ValidateMiddleware extends AbstractMiddleware {
-    handle(request) {
-        console.log('ValidateMiddleWare');
-        if (request.body) {
-            return super.handle(request);
-        }
-        return { error: 'There is not body' };
-    }
-}
-class Controller extends AbstractMiddleware {
-    handle(request) {
-        console.log('Controller');
-        return { Success: request };
-    }
-}
-const controller = new Controller();
-const validate = new ValidateMiddleware();
-const auth = new AuthMiddleware();
-auth.next(validate).next(controller);
-console.log(auth.handle({
-    userId: 1,
-    body: 'I am Ok!'
-}));
+const handler = new EventHandler();
+const logger = new Log();
+const notification = new Notifications();
+const m = new NotificationMediator(notification, logger, handler);
+handler.setMediator(m);
+handler.myEvent();
