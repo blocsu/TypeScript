@@ -2562,82 +2562,134 @@
 // controller.run();
 
 
-//============== 14_115 State ========================
-class DocumentItem {
-	public text: string;
-	private state: DocumentItemState;
+// //============== 14_115 State ========================
+// class DocumentItem {
+// 	public text: string;
+// 	private state: DocumentItemState;
 
-	constructor() {
-		this.setState(new DraftDocumentItemState())
-	}
+// 	constructor() {
+// 		this.setState(new DraftDocumentItemState())
+// 	}
 
-	getState() {
-		return this.state;
-	}
+// 	getState() {
+// 		return this.state;
+// 	}
 
-	setState(state: DocumentItemState) {
-		this.state = state;
-		this.state.setContext(this);
-	}
+// 	setState(state: DocumentItemState) {
+// 		this.state = state;
+// 		this.state.setContext(this);
+// 	}
 
-	publishDoc() {
-		this.state.publish();
-	}
+// 	publishDoc() {
+// 		this.state.publish();
+// 	}
 
-	deleteDoc() {
-		this.state.delete();
-	}
-}
+// 	deleteDoc() {
+// 		this.state.delete();
+// 	}
+// }
 
-abstract class DocumentItemState {
-	public name: string;
-	public item: DocumentItem;
+// abstract class DocumentItemState {
+// 	public name: string;
+// 	public item: DocumentItem;
 
-	public setContext(item: DocumentItem) {
-		this.item = item
-	}
+// 	public setContext(item: DocumentItem) {
+// 		this.item = item
+// 	}
 
-	public abstract publish(): void;
-	public abstract delete(): void;
-}
+// 	public abstract publish(): void;
+// 	public abstract delete(): void;
+// }
 
-class DraftDocumentItemState extends DocumentItemState {
-	constructor() {
-		super();
-		this.name = 'DraftDocument';		
-	}
+// class DraftDocumentItemState extends DocumentItemState {
+// 	constructor() {
+// 		super();
+// 		this.name = 'DraftDocument';		
+// 	}
 
-	public publish(): void {
-		console.log(`На сайт отправлен текст ${this.item.text}`);		
-		this.item.setState(new PublishDocumentItemState());
-	}
-	public delete(): void {
-		console.log('Документ удалён');
+// 	public publish(): void {
+// 		console.log(`На сайт отправлен текст ${this.item.text}`);		
+// 		this.item.setState(new PublishDocumentItemState());
+// 	}
+// 	public delete(): void {
+// 		console.log('Документ удалён');
 		
+// 	}
+// }
+
+// class PublishDocumentItemState extends DocumentItemState {
+// 	constructor() {
+// 		super();
+// 		this.name = 'PublishDocument';		
+// 	}
+
+// 	public publish(): void {
+// 		console.log('Нельзя опубликовать опубликованный документ');		
+// 	}
+
+// 	public delete(): void {
+// 		console.log('Снято с публикации');
+// 		this.item.setState(new DraftDocumentItemState());
+// 	}
+// }
+
+// const item = new DocumentItem();
+// item.text = 'Мой пост!';
+// console.log(item.getState());
+// item.publishDoc();
+// console.log(item.getState());
+// item.publishDoc();
+// item.deleteDoc();
+// console.log(item.getState());
+
+
+//============== 14_116 Strategy ========================
+class User {
+	githubToken: string;
+	jwtToken: string;
+}
+
+interface AuthStrategy {
+	auth(user: User): boolean;
+}
+
+class Auth {
+	constructor(private strategy: AuthStrategy) {}
+
+	setStrategy(strategy: AuthStrategy) {
+		this.strategy = strategy;
+	}
+
+	public authUser(user: User): boolean {
+		return this.strategy.auth(user);
 	}
 }
 
-class PublishDocumentItemState extends DocumentItemState {
-	constructor() {
-		super();
-		this.name = 'PublishDocument';		
-	}
-
-	public publish(): void {
-		console.log('Нельзя опубликовать опубликованный документ');		
-	}
-
-	public delete(): void {
-		console.log('Снято с публикации');
-		this.item.setState(new DraftDocumentItemState());
+class JWTStrategy implements AuthStrategy {
+	auth(user: User): boolean {
+		if (user.jwtToken) {
+			/*Подключение к базе, расшифровка JWT токена, существуе юзер или нет,
+			JWT валиден или нет и т.д.*/
+			return true;
+		}
+		return false;
 	}
 }
 
-const item = new DocumentItem();
-item.text = 'Мой пост!';
-console.log(item.getState());
-item.publishDoc();
-console.log(item.getState());
-item.publishDoc();
-item.deleteDoc();
-console.log(item.getState());
+class GithubStrategy implements AuthStrategy {
+	auth(user: User): boolean {
+		if (user.githubToken) {
+			//Идём в API...
+			return true;
+		}
+		return false;
+	}
+}
+
+const user = new User();
+user.jwtToken = 'token';
+const auth = new Auth(new JWTStrategy());
+console.log(auth.authUser(user));
+auth.setStrategy(new GithubStrategy());
+console.log(auth.authUser(user));
+
