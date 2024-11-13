@@ -2480,83 +2480,164 @@
 // handler.myEvent();
 
 
-//============== 14_114 Command ========================
-class User {
-	constructor(public userId: number) {}
+// //============== 14_114 Command ========================
+// class User {
+// 	constructor(public userId: number) {}
+// }
+
+// class CommandHistory {
+// 	public commands: Command[] = [];
+
+// 	push(command: Command) {
+// 		this.commands.push(command);
+// 	}
+
+// 	remove(command: Command) {
+// 		this.commands = this.commands.filter(c => c.commandId !== command.commandId)
+// 	}
+// }
+
+// abstract class Command {
+// 	public commandId: number;
+
+// 	abstract execute(): void;
+
+// 	constructor(public history: CommandHistory) {
+// 		this.commandId = Math.random();
+// 	}
+// }
+
+// class AddUserCommand extends Command {
+// 	constructor(
+// 		private user: User,
+// 		private receiver: UserService,
+// 		history: CommandHistory
+// 	) {
+// 		super(history)
+// 	}
+// 	execute(): void {
+// 		this.receiver.saveUser(this.user);
+// 		this.history.push(this);
+// 	}
+
+// 	undo() {
+// 		this.receiver.deleteUser(this.user.userId);
+// 		this.history.remove(this);
+// 	}
+// }
+
+// class UserService {
+// 	saveUser(user: User) {
+// 		console.log(`Сохраняю пользователя с id ${user.userId}`);		
+// 	}
+
+// 	deleteUser(userId: number) {
+// 		console.log(`Удаляем пользователя с id ${userId}`);		
+// 	}
+// }
+
+// class Controller {
+// 	receiver: UserService;
+// 	history: CommandHistory = new CommandHistory();
+
+// 	addReceiver(receiver: UserService) {
+// 		this.receiver = receiver;
+// 	}
+
+// 	run() {
+// 		const addUserCommand = new AddUserCommand(
+// 			new User(1),
+// 			this.receiver,
+// 			this.history
+// 		)
+// 		addUserCommand.execute();
+// 		console.log(addUserCommand.history);
+// 		addUserCommand.undo();
+// 		console.log(addUserCommand.history);				
+// 	}
+// }
+
+// const controller = new Controller();
+// controller.addReceiver(new UserService());
+// controller.run();
+
+
+//============== 14_115 State ========================
+class DocumentItem {
+	public text: string;
+	private state: DocumentItemState;
+
+	constructor() {
+		this.setState(new DraftDocumentItemState())
+	}
+
+	getState() {
+		return this.state;
+	}
+
+	setState(state: DocumentItemState) {
+		this.state = state;
+		this.state.setContext(this);
+	}
+
+	publishDoc() {
+		this.state.publish();
+	}
+
+	deleteDoc() {
+		this.state.delete();
+	}
 }
 
-class CommandHistory {
-	public commands: Command[] = [];
+abstract class DocumentItemState {
+	public name: string;
+	public item: DocumentItem;
 
-	push(command: Command) {
-		this.commands.push(command);
+	public setContext(item: DocumentItem) {
+		this.item = item
 	}
 
-	remove(command: Command) {
-		this.commands = this.commands.filter(c => c.commandId !== command.commandId)
+	public abstract publish(): void;
+	public abstract delete(): void;
+}
+
+class DraftDocumentItemState extends DocumentItemState {
+	constructor() {
+		super();
+		this.name = 'DraftDocument';		
+	}
+
+	public publish(): void {
+		console.log(`На сайт отправлен текст ${this.item.text}`);		
+		this.item.setState(new PublishDocumentItemState());
+	}
+	public delete(): void {
+		console.log('Документ удалён');
+		
 	}
 }
 
-abstract class Command {
-	public commandId: number;
+class PublishDocumentItemState extends DocumentItemState {
+	constructor() {
+		super();
+		this.name = 'PublishDocument';		
+	}
 
-	abstract execute(): void;
+	public publish(): void {
+		console.log('Нельзя опубликовать опубликованный документ');		
+	}
 
-	constructor(public history: CommandHistory) {
-		this.commandId = Math.random();
+	public delete(): void {
+		console.log('Снято с публикации');
+		this.item.setState(new DraftDocumentItemState());
 	}
 }
 
-class AddUserCommand extends Command {
-	constructor(
-		private user: User,
-		private receiver: UserService,
-		history: CommandHistory
-	) {
-		super(history)
-	}
-	execute(): void {
-		this.receiver.saveUser(this.user);
-		this.history.push(this);
-	}
-
-	undo() {
-		this.receiver.deleteUser(this.user.userId);
-		this.history.remove(this);
-	}
-}
-
-class UserService {
-	saveUser(user: User) {
-		console.log(`Сохраняю пользователя с id ${user.userId}`);		
-	}
-
-	deleteUser(userId: number) {
-		console.log(`Удаляем пользователя с id ${userId}`);		
-	}
-}
-
-class Controller {
-	receiver: UserService;
-	history: CommandHistory = new CommandHistory();
-
-	addReceiver(receiver: UserService) {
-		this.receiver = receiver;
-	}
-
-	run() {
-		const addUserCommand = new AddUserCommand(
-			new User(1),
-			this.receiver,
-			this.history
-		)
-		addUserCommand.execute();
-		console.log(addUserCommand.history);
-		addUserCommand.undo();
-		console.log(addUserCommand.history);				
-	}
-}
-
-const controller = new Controller();
-controller.addReceiver(new UserService());
-controller.run();
+const item = new DocumentItem();
+item.text = 'Мой пост!';
+console.log(item.getState());
+item.publishDoc();
+console.log(item.getState());
+item.publishDoc();
+item.deleteDoc();
+console.log(item.getState());
