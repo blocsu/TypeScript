@@ -2065,42 +2065,112 @@
 // item.publishDoc();
 // item.deleteDoc();
 // console.log(item.getState());
-//============== 14_116 Strategy ========================
-class User {
+// //============== 14_116 Strategy ========================
+// class User {
+// 	githubToken: string;
+// 	jwtToken: string;
+// }
+// interface AuthStrategy {
+// 	auth(user: User): boolean;
+// }
+// class Auth {
+// 	constructor(private strategy: AuthStrategy) {}
+// 	setStrategy(strategy: AuthStrategy) {
+// 		this.strategy = strategy;
+// 	}
+// 	public authUser(user: User): boolean {
+// 		return this.strategy.auth(user);
+// 	}
+// }
+// class JWTStrategy implements AuthStrategy {
+// 	auth(user: User): boolean {
+// 		if (user.jwtToken) {
+// 			/*Подключение к базе, расшифровка JWT токена, существуе юзер или нет,
+// 			JWT валиден или нет и т.д.*/
+// 			return true;
+// 		}
+// 		return false;
+// 	}
+// }
+// class GithubStrategy implements AuthStrategy {
+// 	auth(user: User): boolean {
+// 		if (user.githubToken) {
+// 			//Идём в API...
+// 			return true;
+// 		}
+// 		return false;
+// 	}
+// }
+// const user = new User();
+// user.jwtToken = 'token';
+// const auth = new Auth(new JWTStrategy());
+// console.log(auth.authUser(user));
+// auth.setStrategy(new GithubStrategy());
+// console.log(auth.authUser(user));
+//============== 14_117 Iterator ========================
+class Task {
+    constructor(priority) {
+        this.priority = priority;
+    }
 }
-class Auth {
-    constructor(strategy) {
-        this.strategy = strategy;
+class TaskList {
+    constructor() {
+        this.tasks = [];
     }
-    setStrategy(strategy) {
-        this.strategy = strategy;
+    sortByPriority() {
+        this.tasks = this.tasks.sort((a, b) => {
+            if (a.priority > b.priority) {
+                return 1;
+            }
+            else if (a.priority == b.priority) {
+                return 0;
+            }
+            else {
+                return -1;
+            }
+        });
     }
-    authUser(user) {
-        return this.strategy.auth(user);
+    addTask(task) {
+        this.tasks.push(task);
+    }
+    getTask() {
+        return this.tasks;
+    }
+    count() {
+        return this.tasks.length;
+    }
+    getIterator() {
+        return new PriorityTaskIterator(this);
     }
 }
-class JWTStrategy {
-    auth(user) {
-        if (user.jwtToken) {
-            /*Подключение к базе, расшифровка JWT токена, существуе юзер или нет,
-            JWT валиден или нет и т.д.*/
-            return true;
-        }
-        return false;
+class PriorityTaskIterator {
+    constructor(taskList) {
+        this.position = 0;
+        taskList.sortByPriority();
+        this.taskList = taskList;
+    }
+    current() {
+        return this.taskList.getTask()[this.position];
+    }
+    next() {
+        this.position += 1;
+        return this.taskList.getTask()[this.position];
+    }
+    prev() {
+        this.position -= 1;
+        return this.taskList.getTask()[this.position];
+    }
+    index() {
+        return this.position;
     }
 }
-class GithubStrategy {
-    auth(user) {
-        if (user.githubToken) {
-            //Идём в API...
-            return true;
-        }
-        return false;
-    }
-}
-const user = new User();
-user.jwtToken = 'token';
-const auth = new Auth(new JWTStrategy());
-console.log(auth.authUser(user));
-auth.setStrategy(new GithubStrategy());
-console.log(auth.authUser(user));
+const taskList = new TaskList();
+taskList.addTask(new Task(8));
+taskList.addTask(new Task(1));
+taskList.addTask(new Task(3));
+const iterator = taskList.getIterator();
+console.log(iterator.current());
+console.log(iterator.next());
+console.log(iterator.next());
+console.log(iterator.prev());
+console.log(iterator.index());
